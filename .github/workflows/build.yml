@@ -27,8 +27,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android SDK Packages
+        run: |
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
       - name: Install dependencies
         run: npm install
+
+      - name: Remove existing Android platform (if any)
+        run: rm -rf android
 
       - name: Add Android platform
         run: npx cap add android
