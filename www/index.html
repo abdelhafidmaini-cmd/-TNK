@@ -1,1 +1,2778 @@
-x
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>عملي</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', 'Inter', sans-serif;
+      background-color: #0b1120;
+      color: #f8fafc;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .num-font {
+      font-family: 'Inter', 'Cairo', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 9999px;
+    }
+    .pulse-ring {
+      animation: pulse-ring 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-20 md:pb-8">
+
+  <!-- Top App Bar ("عملي") -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow-md">
+    <div class="max-w-3xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <h1 class="text-xl md:text-2xl font-extrabold text-white tracking-wide">عملي</h1>
+      </div>
+
+      <!-- Current Work Mode Pill in Header -->
+      <div id="headerWorkModePill" class="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-extrabold text-amber-400">
+        نظام بوسط (Poste)
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-3xl w-full mx-auto px-4 pt-4 space-y-5">
+
+    <!-- Compact Quick Setup Row: Date Input + Work Mode Dropdown Side by Side -->
+    <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider block">ضبط بداية المناوبة ونظام العمل</span>
+          <h2 class="text-sm font-bold text-slate-200 mt-0.5">حدد تاريخ دخولك للعمل وطريقة الدوام</h2>
+        </div>
+
+        <!-- Controls Row: Calendar Picker + Work Mode Select Box + "بدأت اليوم" -->
+        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <!-- Calendar Date Picker -->
+          <div class="relative flex-1 sm:flex-initial">
+            <input type="date" id="quickStartDateInput" aria-label="تاريخ بداية المناوبة" class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 text-white text-xs sm:text-sm font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-500 num-font">
+          </div>
+
+          <!-- Work Mode Popup Select (بوسط / سورفاس) right next to Calendar -->
+          <div class="relative flex-1 sm:flex-initial">
+            <select id="quickWorkModeSelect" aria-label="اختر نظام العمل" class="w-full bg-slate-950 border border-slate-700 hover:border-slate-600 text-amber-400 text-xs sm:text-sm font-extrabold rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-500 cursor-pointer">
+              <option value="poste" class="bg-slate-900 text-white">🔄 بوسط (دخول 05:50 / 17:50)</option>
+              <option value="surface" class="bg-slate-900 text-white">☀️ سورفاس (06:50-11:45 | 12:50-18:50)</option>
+            </select>
+          </div>
+
+          <button id="btnSetTodayStart" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2.5 rounded-xl font-bold transition shrink-0">
+            بدأت اليوم
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Desktop/Tablet Inline Navigation Tabs -->
+    <nav class="hidden md:grid grid-cols-4 gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
+      <button type="button" data-tab="dashboard" class="nav-tab-btn py-2.5 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 bg-amber-500 text-slate-950 shadow">
+        <span>العداد والحالة</span>
+      </button>
+      <button type="button" data-tab="holidays" class="nav-tab-btn py-2.5 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <span>الأعياد والمناسبات</span>
+      </button>
+      <button type="button" data-tab="calendar" class="nav-tab-btn py-2.5 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <span>الرزنامة وفحص تاريخ</span>
+      </button>
+      <button type="button" data-tab="settings" class="nav-tab-btn py-2.5 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <span>إعدادات المناوبة</span>
+      </button>
+    </nav>
+
+    <!-- TAB 1: DASHBOARD (العداد والحالة) -->
+    <div id="tab-dashboard" class="tab-panel space-y-5">
+
+      <!-- Main Hero Status & Countdown Card -->
+      <div id="heroCard" class="relative overflow-hidden rounded-3xl p-6 border shadow-xl transition-all duration-300 bg-gradient-to-br from-amber-950/70 via-slate-900 to-slate-900 border-amber-500/40">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          <!-- Text Status Side -->
+          <div class="space-y-3 text-center md:text-right flex-1">
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold" id="statusBadge">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 pulse-ring" id="statusDot"></span>
+                <span id="statusBadgeText">أنت الآن في فترة العمل</span>
+              </div>
+              <div id="shiftTimingBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span>🌙 مناوبة ليلية: 06:00 مساءً - 06:00 صباحاً (12 سا)</span>
+              </div>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-snug" id="mainHeadline">
+              بقي لك <span class="text-amber-400 num-font" id="daysRemainingBig">14</span> يوماً للخروج إلى العطلة!
+            </h2>
+
+            <p class="text-sm text-slate-300" id="subHeadline">
+              اليوم هو <span class="font-bold text-white" id="todayFormattedText">الجمعة 23 أكتوبر 2026</span>
+              <span class="inline-block text-sky-400 font-bold mx-1" id="todayHijriFormattedText"></span>
+              — اليوم رقم <span class="font-bold num-font" id="currentDayInPhase">15</span> من أصل <span class="num-font" id="totalPhaseDays">28</span> يوماً.
+            </p>
+
+
+
+            <!-- Linear Progress Bar -->
+            <div class="pt-1">
+              <div class="flex justify-between text-xs font-semibold mb-1.5">
+                <span id="progressStartLabel" class="text-slate-400">بداية الفترة</span>
+                <span id="progressPercentLabel" class="num-font text-amber-400 font-bold">50% مكتمل</span>
+                <span id="progressEndLabel" class="text-slate-400">موعد التبديل</span>
+              </div>
+              <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                <div id="progressBarFill" class="h-full rounded-full bg-gradient-to-l from-amber-400 to-orange-500 transition-all duration-500" style="width: 50%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dual Circular Visual Gauges Side by Side (الاثنين جنب بعض) -->
+          <div class="flex items-center justify-center gap-3 sm:gap-4 shrink-0">
+            <!-- Gauge 1: Remaining Days in Rotation (متبقي للخروج / لانتهاء الإجازة) -->
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center shrink-0">
+              <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" stroke="#1e293b" stroke-width="10" fill="transparent" />
+                <circle id="gaugeCircle" cx="60" cy="60" r="50" stroke="#f59e0b" stroke-width="10" stroke-dasharray="314.16" stroke-dashoffset="157" stroke-linecap="round" fill="transparent" class="transition-all duration-500" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
+                <span class="text-[11px] text-slate-400 font-semibold leading-tight" id="gaugeTopLabel">متبقي للخروج</span>
+                <span class="text-3xl sm:text-4xl font-extrabold text-white num-font leading-none my-1" id="gaugeCenterDays">14</span>
+                <span class="text-xs font-bold text-amber-400" id="gaugeBottomLabel">يوم</span>
+              </div>
+            </div>
+
+            <!-- Gauge 2: 12-Hour Daily Shift Countdown Clock (عد تنازلي 12 ساعة للخروج من العمل أو الرجوع للعمل) -->
+            <div class="relative w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center shrink-0">
+              <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" stroke="#1e293b" stroke-width="10" fill="transparent" />
+                <circle id="shiftClockCircle" cx="60" cy="60" r="50" stroke="#38bdf8" stroke-width="10" stroke-dasharray="314.16" stroke-dashoffset="100" stroke-linecap="round" fill="transparent" class="transition-all duration-500" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
+                <span class="text-[10px] sm:text-[11px] text-slate-300 font-bold leading-tight" id="shiftClockTopLabel">متبقي للخروج من العمل</span>
+                <span class="text-lg sm:text-xl font-extrabold text-white num-font tracking-tight leading-none my-1.5" id="shiftClockCenterTime">00:00:00</span>
+                <span class="text-[10px] sm:text-[11px] font-bold text-sky-400 leading-tight" id="shiftClockBottomLabel">12 ساعة</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Key Dates Strip inside Hero -->
+        <div class="mt-6 pt-4 border-t border-slate-800/90 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80">
+            <span class="text-xs text-slate-400 block">بداية هذه الفترة</span>
+            <span class="text-sm font-bold text-white num-font mt-1 block" id="cardPhaseStart">--</span>
+          </div>
+          <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80">
+            <span class="text-xs text-slate-400 block" id="cardTransitionTitle">تاريخ الخروج (النزول)</span>
+            <span class="text-sm font-bold text-emerald-400 num-font mt-1 block" id="cardTransitionDate">--</span>
+          </div>
+          <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80">
+            <span class="text-xs text-slate-400 block" id="cardNextReturnTitle">العودة للعمل بعدها</span>
+            <span class="text-sm font-bold text-amber-400 num-font mt-1 block" id="cardNextReturnDate">--</span>
+          </div>
+          <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80">
+            <span class="text-xs text-slate-400 block">الأعياد القادمة في البيت</span>
+            <span class="text-sm font-bold text-sky-400 num-font mt-1 block" id="cardHolidaysAtHomeRatio">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Ramadan Card (خانة رمضان) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-lg">
+        <button type="button" id="btnToggleRamadanDrawer" class="w-full flex items-center justify-between gap-3 text-right">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-xl shrink-0">
+              🌙
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold text-white">رمضان</h3>
+              <p class="text-xs text-slate-400 num-font" id="ramadanQuickHeaderSummary">--</p>
+            </div>
+          </div>
+          <span id="ramadanDrawerBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-emerald-400 text-xs font-extrabold shrink-0">
+            <span id="ramadanDrawerLabel">التفاصيل</span>
+            <span id="ramadanDrawerArrow">▼</span>
+          </span>
+        </button>
+
+        <!-- Opened Ramadan Details Drawer (مختصرة ومنظمة وسهلة القراءة) -->
+        <div id="ramadanDrawerBox" class="hidden mt-4 pt-4 border-t border-slate-800 space-y-3.5">
+          <!-- Row 1: Year & Month Days Selectors + Start/End Dates -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/80 border border-slate-800 rounded-2xl px-3.5 py-2.5">
+            <span class="text-xs font-bold text-slate-200 num-font" id="ramadanStartEndSummaryText">--</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <select id="ramadanYearSelect" aria-label="اختر سنة رمضان" class="bg-slate-900 border border-slate-700 text-emerald-300 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 cursor-pointer num-font">
+                <option value="ramadan-2027">1448 هـ (2027)</option>
+                <option value="ramadan-2028">1449 هـ (2028)</option>
+              </select>
+              <select id="ramadanDaysCountSelect" aria-label="عدد أيام شهر رمضان" class="bg-slate-900 border border-slate-700 text-amber-300 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-amber-500 cursor-pointer num-font">
+                <option value="30">30 يوم</option>
+                <option value="29">29 يوم</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 2: Two Clean Summary Boxes (في البيت vs في العمل) -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-emerald-950/35 border border-emerald-500/35 rounded-2xl p-3 text-center">
+              <span class="text-xs font-bold text-emerald-300 block">صيام في البيت 🏠</span>
+              <span class="text-2xl sm:text-3xl font-extrabold text-emerald-400 num-font my-0.5 block" id="ramadanHomeDaysBig">0</span>
+              <span class="text-[11px] text-slate-400 num-font block" id="ramadanHomeDaysSub">يوم</span>
+            </div>
+
+            <div class="bg-amber-950/35 border border-amber-500/35 rounded-2xl p-3 text-center">
+              <span class="text-xs font-bold text-amber-300 block">صيام في العمل 👷</span>
+              <span class="text-2xl sm:text-3xl font-extrabold text-amber-400 num-font my-0.5 block" id="ramadanWorkDaysBig">0</span>
+              <span class="text-[11px] text-amber-200/90 num-font block" id="ramadanWorkShiftBreakdownSub">يوم</span>
+            </div>
+          </div>
+
+          <!-- Row 3: Clean Organized Table of Periods (من متى تبدأ وكم يوم) -->
+          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl overflow-hidden">
+            <div class="grid grid-cols-3 bg-slate-900/90 border-b border-slate-800 px-3.5 py-2 text-[11px] font-extrabold text-slate-400">
+              <div>الفترة والدوام</div>
+              <div>من متى إلى متى</div>
+              <div class="text-left">عدد الأيام</div>
+            </div>
+            <div id="ramadanPeriodsBreakdownList" class="divide-y divide-slate-800/70 num-font">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eid Al-Adha Card right after Ramadan Card (خانة عيد الأضحى) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-lg">
+        <button type="button" id="btnToggleAdhaDrawer" class="w-full flex items-center justify-between gap-3 text-right">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
+              🐑
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold text-white">عيد الأضحى</h3>
+              <p class="text-xs text-slate-400 num-font" id="adhaQuickDateSubtitle">--</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span id="adhaMainStatusBadge" class="px-3 py-1.5 rounded-xl text-xs font-extrabold">--</span>
+            <span id="adhaDrawerArrow" class="text-xs text-slate-400 font-bold">▼</span>
+          </div>
+        </button>
+
+        <!-- Opened Eid Al-Adha Concise Details Drawer -->
+        <div id="adhaDrawerBox" class="hidden mt-4 pt-4 border-t border-slate-800 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/80 border border-slate-800 rounded-2xl px-3.5 py-2.5">
+            <span class="text-xs font-bold text-slate-200 num-font" id="adhaDateRangeSummary">--</span>
+            <select id="adhaYearSelect" aria-label="اختر سنة عيد الأضحى" class="bg-slate-900 border border-slate-700 text-amber-300 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-amber-500 cursor-pointer num-font">
+              <option value="2027">1448 هـ (2027)</option>
+              <option value="2028">1449 هـ (2028)</option>
+            </select>
+          </div>
+
+          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl overflow-hidden">
+            <div class="grid grid-cols-3 bg-slate-900/90 border-b border-slate-800 px-3.5 py-2 text-[11px] font-extrabold text-slate-400">
+              <div>اليوم</div>
+              <div>التاريخ</div>
+              <div class="text-left">الحالة</div>
+            </div>
+            <div id="adhaDaysBreakdownList" class="divide-y divide-slate-800/70 num-font">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Holidays Collapsible Popup Card (أقرب المناسبات الدينية والأعياد القادمة في نافذة منبثقة) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-lg">
+        <button type="button" id="btnToggleUpcomingHolidaysDrawer" class="w-full flex items-center justify-between gap-3 text-right">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xl shrink-0">
+              🎉
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold text-white">أقرب المناسبات الدينية والأعياد القادمة</h3>
+              <p class="text-xs text-slate-400" id="upcomingHolidaysSummaryHint">اضغط هنا لفتح النافذة المنبثقة وعرض الأعياد القادمة وحالتك فيها</p>
+            </div>
+          </div>
+          <span id="upcomingHolidaysDrawerBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-sky-400 text-xs font-extrabold shrink-0">
+            <span id="upcomingHolidaysDrawerLabel">فتح النافذة</span>
+            <span id="upcomingHolidaysDrawerArrow">▼</span>
+          </span>
+        </button>
+
+        <div id="upcomingHolidaysDrawerBox" class="hidden mt-4 pt-4 border-t border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-300">أقرب 6 مناسبات وأعياد قادمة (في البيت أم في العمل):</span>
+            <button type="button" id="btnViewAllHolidays" class="text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl transition">
+              عرض كل الأعياد ←
+            </button>
+          </div>
+
+          <div id="upcomingHolidaysPreview" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Cycles Collapsible Icon Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-lg">
+        <button type="button" id="btnToggleCyclesDrawer" class="w-full flex items-center justify-between gap-3 text-right">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
+              🗓️
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold text-white">جدول الدورات القادمة (مواعيد الطلوع والنزول)</h3>
+              <p class="text-xs text-slate-400">اضغط هنا لفتح وعرض تواريخ الدورات الـ 8 القادمة</p>
+            </div>
+          </div>
+          <span id="cyclesDrawerBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-amber-400 text-xs font-extrabold shrink-0">
+            <span id="cyclesDrawerLabel">فتح الجدول</span>
+            <span id="cyclesDrawerArrow">▼</span>
+          </span>
+        </button>
+
+        <div id="rotationCyclesDrawerBox" class="hidden mt-4 pt-4 border-t border-slate-800 overflow-x-auto custom-scrollbar">
+          <table class="w-full text-right text-sm">
+            <thead>
+              <tr class="border-b border-slate-800 text-xs text-slate-400">
+                <th class="pb-2.5 font-bold">الدورة</th>
+                <th class="pb-2.5 font-bold">الحالة ونظام الدوام</th>
+                <th class="pb-2.5 font-bold">من تاريخ (البداية)</th>
+                <th class="pb-2.5 font-bold">إلى تاريخ (النهاية)</th>
+                <th class="pb-2.5 font-bold">المدة</th>
+              </tr>
+            </thead>
+            <tbody id="rotationCyclesTableBody" class="divide-y divide-slate-800/60 num-font">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: HOLIDAYS (الأعياد والمناسبات الدينية والوطنية) -->
+    <div id="tab-holidays" class="tab-panel hidden space-y-5">
+
+      <!-- Two Expandable Summary Cards (Click to open/close list of holidays inside each) -->
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Card 1: Holidays at Home -->
+        <button type="button" id="btnToggleHomeHolidaysDrawer" class="bg-emerald-950/40 hover:bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-4 text-center transition flex flex-col items-center justify-between shadow-md">
+          <span class="text-xs text-emerald-300 font-bold block">أعياد ومناسبات في البيت 🏠</span>
+          <span class="text-3xl font-extrabold text-emerald-400 num-font my-1.5 block" id="statHolidaysHome">0</span>
+          <span class="inline-flex items-center gap-1 text-[11px] text-emerald-300/90 font-semibold bg-emerald-500/15 px-2.5 py-0.5 rounded-lg" id="homeDrawerHintLabel">
+            <span>اضغط لعرض القائمة</span>
+            <span id="homeDrawerArrow">▼</span>
+          </span>
+        </button>
+
+        <!-- Card 2: Holidays at Work -->
+        <button type="button" id="btnToggleWorkHolidaysDrawer" class="bg-amber-950/40 hover:bg-amber-950/60 border border-amber-500/40 rounded-2xl p-4 text-center transition flex flex-col items-center justify-between shadow-md">
+          <span class="text-xs text-amber-300 font-bold block">أعياد ومناسبات في العمل 👷</span>
+          <span class="text-3xl font-extrabold text-amber-400 num-font my-1.5 block" id="statHolidaysWork">0</span>
+          <span class="inline-flex items-center gap-1 text-[11px] text-amber-300/90 font-semibold bg-amber-500/15 px-2.5 py-0.5 rounded-lg" id="workDrawerHintLabel">
+            <span>اضغط لعرض القائمة</span>
+            <span id="workDrawerArrow">▼</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Expandable Drawer 1: List of Holidays at Home and their dates -->
+      <div id="homeHolidaysDrawerBox" class="hidden bg-emerald-950/25 border border-emerald-500/40 rounded-2xl p-4 space-y-3 shadow-lg">
+        <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2.5">
+          <h4 class="text-sm font-extrabold text-emerald-300">🏠 قائمة الأعياد والمناسبات التي تصادف عطلتك في البيت</h4>
+          <button type="button" id="btnCloseHomeDrawer" class="text-xs text-slate-400 hover:text-white font-bold px-2 py-0.5 rounded-lg bg-slate-800/80">إغلاق ✕</button>
+        </div>
+        <div id="homeHolidaysDrawerList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto custom-scrollbar">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Expandable Drawer 2: List of Holidays at Work and their dates -->
+      <div id="workHolidaysDrawerBox" class="hidden bg-amber-950/25 border border-amber-500/40 rounded-2xl p-4 space-y-3 shadow-lg">
+        <div class="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+          <h4 class="text-sm font-extrabold text-amber-300">👷 قائمة الأعياد والمناسبات التي تصادف فترة عملك</h4>
+          <button type="button" id="btnCloseWorkDrawer" class="text-xs text-slate-400 hover:text-white font-bold px-2 py-0.5 rounded-lg bg-slate-800/80">إغلاق ✕</button>
+        </div>
+        <div id="workHolidaysDrawerList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto custom-scrollbar">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" data-hfilter="all" class="holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition">الكل</button>
+          <button type="button" data-hfilter="religious" class="holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white transition">الأعياد الدينية 🌙</button>
+          <button type="button" data-hfilter="national" class="holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white transition">الأعياد الوطنية 🇩🇿</button>
+          <button type="button" data-hfilter="home" class="holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-emerald-400 hover:bg-emerald-950/60 transition">في البيت فقط 🏠</button>
+          <button type="button" data-hfilter="work" class="holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-amber-400 hover:bg-amber-950/60 transition">في العمل فقط 👷</button>
+        </div>
+
+        <button type="button" id="btnOpenAddCustomModal" class="text-xs font-bold bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+          <span>+ إضافة مناسبة خاصة</span>
+        </button>
+      </div>
+
+      <!-- Holidays Detailed List -->
+      <div id="holidaysFullList" class="space-y-3">
+        <!-- Populated by JS -->
+      </div>
+
+    </div>
+
+    <!-- TAB 3: CALENDAR & DATE CHECKER (الرزنامة وفحص أي تاريخ) -->
+    <div id="tab-calendar" class="tab-panel hidden space-y-5">
+
+      <!-- Specific Date Checker Tool -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+        <h3 class="text-base font-extrabold text-white mb-1">فاحص التواريخ السريع 🔍</h3>
+        <p class="text-xs text-slate-400 mb-4">اختر أي تاريخ مستقبلي لمعرفة إن كنت ستكون في البيت أم في العمل ونوع دوامك (ليل / نهار / راحة 24 سا)</p>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <input type="date" id="checkAnyDateInput" class="bg-slate-950 border border-slate-700 text-white text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-amber-500 num-font flex-1">
+          <div id="checkDateResultBox" class="flex-1 rounded-2xl p-3.5 border flex items-center justify-between bg-slate-950 border-slate-800 gap-2">
+            <div>
+              <span class="text-xs text-slate-400 block" id="checkDateDayName">اختر تاريخاً</span>
+              <span class="text-sm font-extrabold text-white mt-0.5 block" id="checkDateStatusText">--</span>
+              <span class="text-xs text-amber-300 mt-0.5 block" id="checkDateShiftHours">--</span>
+            </div>
+            <span id="checkDateBadge" class="px-3 py-1 rounded-xl text-xs font-bold shrink-0">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Monthly Visual Calendar -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" id="calPrevMonthBtn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+          <div class="text-center">
+            <h3 class="text-base font-extrabold text-white" id="calMonthYearTitle">أكتوبر 2026</h3>
+            <button type="button" id="calJumpTodayBtn" class="text-[11px] text-amber-400 hover:underline">العودة لشهر اليوم</button>
+          </div>
+          <button type="button" id="calNextMonthBtn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex flex-wrap items-center justify-center gap-3 text-xs mb-3 pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded bg-indigo-500/30 border border-indigo-400"></span>
+            <span class="text-slate-300">عمل ليلي 🌙</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded bg-amber-500/30 border border-amber-500"></span>
+            <span class="text-slate-300">عمل نهاري ☀️</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500"></span>
+            <span class="text-slate-300">عطلة بالبيت 🏠</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-sky-400"></span>
+            <span class="text-slate-300">عيد / مناسبة ⭐</span>
+          </div>
+        </div>
+
+        <!-- Days of week header -->
+        <div class="grid grid-cols-7 gap-1.5 text-center text-xs font-bold text-slate-400 mb-2">
+          <div>الأحد</div>
+          <div>الإثنين</div>
+          <div>الثلاثاء</div>
+          <div>الأربعاء</div>
+          <div>الخميس</div>
+          <div>الجمعة</div>
+          <div>السبت</div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5 num-font">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Selected Calendar Day Detail Bar -->
+        <div id="calSelectedDayDetail" class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span>اضغط على أي يوم في الرزنامة لعرض تفاصيله وتوقيت الدوام فيه.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 4: SETTINGS (إعدادات المناوبة وتخصيص البوسط المرن وضبط الهجري) -->
+    <div id="tab-settings" class="tab-panel hidden space-y-5">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-lg space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-base font-extrabold text-white" id="settingsMainTitle">إعدادات نظام المناوبة والتقويم الهجري</h3>
+            <p class="text-xs text-slate-400" id="settingsMainSubtitle">تحكم في اللغة، وأوقات الدخول والخروج، ونظام المناوبة، والتقويم الهجري.</p>
+          </div>
+
+          <!-- Language Selector (العربية / Français / English) -->
+          <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-2xl p-1.5 shrink-0">
+            <button type="button" data-lang-set="ar" class="lang-switch-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition bg-amber-500 text-slate-950">العربية</button>
+            <button type="button" data-lang-set="fr" class="lang-switch-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition text-slate-300 hover:text-white">Français</button>
+            <button type="button" data-lang-set="en" class="lang-switch-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition text-slate-300 hover:text-white">English</button>
+          </div>
+        </div>
+
+        <!-- SECTION A: Work Mode & Poste Free Split Configuration -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <span class="text-xs sm:text-sm font-extrabold text-amber-400 block">نظام الدوام وتقسيم فترات البوسط</span>
+            <select id="settingWorkModeSelect" class="bg-slate-900 border border-slate-700 text-amber-400 text-xs font-extrabold rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+              <option value="poste">🔄 نظام بوسط (دخول 05:50 أو 17:50 • خروج 18:00 أو 06:00)</option>
+              <option value="surface">☀️ نظام سورفاس (06:50 - 11:45 | 12:50 - 18:50)</option>
+            </select>
+          </div>
+
+          <!-- Poste Detailed Settings Box (Hidden if Surface is selected) -->
+          <div id="settingsPosteConfigBox" class="space-y-4">
+            <!-- Starting Shift Direction (Night first vs Day first) -->
+            <div>
+              <span class="text-xs font-bold text-slate-300 block mb-2" id="lblPosteStartOrder">بماذا تبدأ أول فترة في مناوبة البوسط؟</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button type="button" id="btnPosteNightFirst" class="px-3 py-2.5 rounded-xl text-xs font-bold transition bg-indigo-500/25 text-indigo-300 border border-indigo-500/50 text-right">
+                  🌙 أبدأ بالليل أولاً ثم أتبدل للنهار
+                </button>
+                <button type="button" id="btnPosteDayFirst" class="px-3 py-2.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 border border-slate-800 hover:text-white text-right">
+                  ☀️ أبدأ بالنهار أولاً ثم أتبدل لليل
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Entry & Exit Times for Poste and Surface -->
+          <div class="pt-3 border-t border-slate-800 space-y-4">
+            <span class="text-xs sm:text-sm font-extrabold text-amber-400 block" id="lblCustomShiftTimesTitle">⏰ تعديل وقت الدخول والخروج (البوسط والسورفاس)</span>
+
+            <!-- Poste Entry/Exit Times -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-3">
+              <span class="text-xs font-extrabold text-indigo-300 block" id="lblPosteTimesSub">🔄 مواقيت نظام البوسط (Poste):</span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 num-font">
+                <div>
+                  <label for="timePosteDayStart" class="block text-[11px] text-slate-400 mb-1" id="lblPosteDayIn">دخول النهار ☀️</label>
+                  <input type="time" id="timePosteDayStart" value="05:50" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                  <label for="timePosteDayEnd" class="block text-[11px] text-slate-400 mb-1" id="lblPosteDayOut">خروج النهار ☀️</label>
+                  <input type="time" id="timePosteDayEnd" value="18:00" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                  <label for="timePosteNightStart" class="block text-[11px] text-slate-400 mb-1" id="lblPosteNightIn">دخول الليل 🌙</label>
+                  <input type="time" id="timePosteNightStart" value="17:50" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                  <label for="timePosteNightEnd" class="block text-[11px] text-slate-400 mb-1" id="lblPosteNightOut">خروج الليل 🌙</label>
+                  <input type="time" id="timePosteNightEnd" value="06:00" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-indigo-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- Surface Entry/Exit Times -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-3">
+              <span class="text-xs font-extrabold text-sky-300 block" id="lblSurfaceTimesSub">☀️ مواقيت نظام السورفاس (Surface):</span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 num-font">
+                <div>
+                  <label for="timeSurfaceMorningStart" class="block text-[11px] text-slate-400 mb-1" id="lblSurfMornIn">دخول الصباح</label>
+                  <input type="time" id="timeSurfaceMorningStart" value="06:50" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                  <label for="timeSurfaceMorningEnd" class="block text-[11px] text-slate-400 mb-1" id="lblSurfMornOut">خروج الغذاء</label>
+                  <input type="time" id="timeSurfaceMorningEnd" value="11:45" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                  <label for="timeSurfaceAfternoonStart" class="block text-[11px] text-slate-400 mb-1" id="lblSurfAftIn">رجوع المساء</label>
+                  <input type="time" id="timeSurfaceAfternoonStart" value="12:50" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                  <label for="timeSurfaceAfternoonEnd" class="block text-[11px] text-slate-400 mb-1" id="lblSurfAftOut">خروج المساء</label>
+                  <input type="time" id="timeSurfaceAfternoonEnd" value="18:50" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:border-sky-500">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION B: Hijri Calendar & Religious Holidays Adjustment in Settings -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <span class="text-xs font-extrabold text-sky-400 block">🌙 ضبط وتعديل التقويم الهجري والأعياد الدينية</span>
+              <p class="text-[11px] text-slate-400 mt-0.5">يمكنك تقديم أو تأخير التقويم الهجري العام، أو تعديل تاريخ أي مناسبة دينية بشكل منفرد حسب رؤية الهلال</p>
+            </div>
+            <!-- Live Hijri Today Preview Badge -->
+            <div class="px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs font-extrabold text-sky-300 num-font shrink-0" id="settingsHijriTodayPreview">
+              التاريخ الهجري اليوم: --
+            </div>
+          </div>
+
+          <!-- Global Hijri Offset Controls (-3 to +3 days) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-300">الضبط العام للتقويم الهجري (تقديم / تأخير الهلال):</span>
+              <span id="settingsHijriOffsetBadge" class="text-xs font-extrabold text-amber-400 num-font">0 يوم (الحساب الفلكي)</span>
+            </div>
+            <div class="grid grid-cols-7 gap-1.5 num-font">
+              <button type="button" data-hijri-set="-3" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">-3</button>
+              <button type="button" data-hijri-set="-2" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">-2</button>
+              <button type="button" data-hijri-set="-1" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">-1</button>
+              <button type="button" data-hijri-set="0" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-amber-500 text-slate-950 border-amber-500">0</button>
+              <button type="button" data-hijri-set="1" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">+1</button>
+              <button type="button" data-hijri-set="2" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">+2</button>
+              <button type="button" data-hijri-set="3" class="settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700">+3</button>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
+        <!-- Common Rotation Presets Popup Select Bar -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <label for="commonRotationPresetSelect" class="text-xs font-bold text-slate-300 block">
+            أنظمة مناوبة شائعة (اختر من الشريط المنبثق):
+          </label>
+          <select id="commonRotationPresetSelect" class="bg-slate-900 border border-slate-700 text-amber-400 text-xs sm:text-sm font-extrabold rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500 cursor-pointer num-font">
+            <option value="28,28">4 أسابيع عمل × 4 أسابيع عطلة (28 / 28)</option>
+            <option value="21,21">3 أسابيع عمل × 3 أسابيع عطلة (21 / 21)</option>
+            <option value="35,35">5 أسابيع عمل × 5 أسابيع عطلة (35 / 35)</option>
+            <option value="42,21">6 أسابيع عمل × 3 أسابيع عطلة (42 / 21)</option>
+            <option value="14,14">أسبوعان عمل × أسبوعان عطلة (14 / 14)</option>
+          </select>
+        </div>
+
+
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+          <span class="text-xs text-emerald-400 font-semibold" id="settingsSavedNotice">يتم حفظ جميع تعديلاتك تلقائياً على جهازك.</span>
+          <button type="button" id="btnResetDefaults" class="text-xs text-rose-400 hover:text-rose-300 font-bold px-3 py-1.5 rounded-xl bg-rose-950/40 border border-rose-500/30">
+            إعادة الضبط الافتراضي
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-2 py-1.5 grid grid-cols-4 gap-1">
+    <button type="button" data-tab="dashboard" class="nav-tab-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-amber-400 font-bold">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span class="text-[11px]">العداد</span>
+    </button>
+    <button type="button" data-tab="holidays" class="nav-tab-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 font-bold">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+      <span class="text-[11px]">الأعياد</span>
+    </button>
+    <button type="button" data-tab="calendar" class="nav-tab-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 font-bold">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+      <span class="text-[11px]">الرزنامة</span>
+    </button>
+    <button type="button" data-tab="settings" class="nav-tab-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 font-bold">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+      <span class="text-[11px]">الإعدادات</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: Add Custom Event -->
+  <div id="customEventModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">إضافة مناسبة أو موعد خاص</h3>
+        <button type="button" id="btnCloseCustomModal" class="text-slate-400 hover:text-white text-sm font-bold px-2 py-1">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label for="customEventName" class="block text-xs text-slate-300 font-bold mb-1">اسم المناسبة (مثال: زفاف، سفر، عطلة عائلية)</label>
+          <input type="text" id="customEventName" placeholder="أدخل اسم المناسبة..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="customEventStart" class="block text-xs text-slate-300 font-bold mb-1">تاريخ البداية</label>
+            <input type="date" id="customEventStart" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white num-font focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label for="customEventDays" class="block text-xs text-slate-300 font-bold mb-1">عدد الأيام</label>
+            <input type="number" id="customEventDays" min="1" max="30" value="1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white num-font focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="btnCancelCustomModal" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold">إلغاء</button>
+        <button type="button" id="btnSaveCustomEvent" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold">حفظ المناسبة</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Core Application State & Default Reference ---
+    function getSystemToday() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    function parseYMD(ymdStr) {
+      const parts = ymdStr.split('-').map(Number);
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function formatYMD(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function addDays(dateObj, days) {
+      const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+      d.setDate(d.getDate() + days);
+      return d;
+    }
+
+    function diffDays(dateA, dateB) {
+      const utcA = Date.UTC(dateA.getFullYear(), dateA.getMonth(), dateA.getDate());
+      const utcB = Date.UTC(dateB.getFullYear(), dateB.getMonth(), dateB.getDate());
+      return Math.round((utcA - utcB) / MS_PER_DAY);
+    }
+
+    const MONTHS_BY_LANG = {
+      ar: [
+        'جانفي (يناير)', 'فيفري (فبراير)', 'مارس', 'أفريل (أبريل)',
+        'ماي (مايو)', 'جوان (يونيو)', 'جويلية (يوليو)', 'أوت (أغسطس)',
+        'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+      ],
+      fr: [
+        'Janvier', 'Février', 'Mars', 'Avril',
+        'Mai', 'Juin', 'Juillet', 'Août',
+        'Septembre', 'Octobre', 'Novembre', 'Décembre'
+      ],
+      en: [
+        'January', 'February', 'March', 'April',
+        'May', 'June', 'July', 'August',
+        'September', 'October', 'November', 'December'
+      ]
+    };
+
+    const DAYS_BY_LANG = {
+      ar: ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+      fr: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+      en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    };
+
+    const ARABIC_MONTHS = MONTHS_BY_LANG.ar;
+    const ARABIC_DAYS = DAYS_BY_LANG.ar;
+
+    function tr(arTxt, frTxt, enTxt) {
+      const l = (typeof state !== 'undefined' && state.lang) ? state.lang : 'ar';
+      if (l === 'fr') return frTxt;
+      if (l === 'en') return enTxt;
+      return arTxt;
+    }
+
+    function parseTimeSec(hhmmStr, fallbackStr) {
+      const raw = (hhmmStr && /^\d{1,2}:\d{2}$/.test(hhmmStr)) ? hhmmStr : fallbackStr;
+      const [h, m] = raw.split(':').map(Number);
+      return (h * 3600) + (m * 60);
+    }
+
+    function formatArabicDate(dateObj, includeWeekday = true) {
+      const l = (typeof state !== 'undefined' && state.lang) ? state.lang : 'ar';
+      const daysArr = DAYS_BY_LANG[l] || DAYS_BY_LANG.ar;
+      const monthsArr = MONTHS_BY_LANG[l] || MONTHS_BY_LANG.ar;
+      const dayName = daysArr[dateObj.getDay()];
+      const d = dateObj.getDate();
+      const monthName = monthsArr[dateObj.getMonth()];
+      const y = dateObj.getFullYear();
+      return includeWeekday ? `${dayName} ${d} ${monthName} ${y}` : `${d} ${monthName} ${y}`;
+    }
+
+    // Convert any Eastern Arabic / Persian digits to Western English digits (0-9)
+    function toEnglishDigits(str) {
+      return String(str).replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (c) => {
+        const code = c.charCodeAt(0);
+        return String(code >= 0x06F0 ? code - 0x06F0 : code - 0x0660);
+      });
+    }
+
+    // Format Hijri Date using Intl.DateTimeFormat with Western English digits (0-9) and current language
+    function formatHijriDate(dateObj, hijriOffsetDays = 0) {
+      try {
+        const adjusted = addDays(dateObj, hijriOffsetDays);
+        const l = (typeof state !== 'undefined' && state.lang) ? state.lang : 'ar';
+        const locale = l === 'fr'
+          ? 'fr-FR-u-ca-islamic-umalqura-nu-latn'
+          : (l === 'en' ? 'en-US-u-ca-islamic-umalqura-nu-latn' : 'ar-SA-u-ca-islamic-umalqura-nu-latn');
+        const fmt = new Intl.DateTimeFormat(locale, {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+        return toEnglishDigits(fmt.format(adjusted));
+      } catch (e) {
+        return '';
+      }
+    }
+
+    const HOLIDAY_TRANSLATIONS = {
+      'rev-2026': { fr: ['Anniversaire de la Révolution (1er Nov)', 'Fête nationale'], en: ['Revolution Day (Nov 1)', 'National Holiday'] },
+      'ny-2027': { fr: ['Nouvel An 2027', 'Jour férié'], en: ['New Year’s Day 2027', 'Public Holiday'] },
+      'yennayer-2027': { fr: ['Nouvel An Amazigh (Yennayer)', 'Jour férié'], en: ['Amazigh New Year (Yennayer)', 'Public Holiday'] },
+      'ramadan-2027': { fr: ['1er Jour du Ramadan 1448', '1 Ramadan 1448 H'], en: ['First Day of Ramadan 1448', '1 Ramadan 1448 AH'] },
+      'fitr-2027': { fr: ['Aïd el-Fitr 1448 (3 jours)', '1 - 3 Chawwal 1448 H'], en: ['Eid al-Fitr 1448 (3 days)', '1 - 3 Shawwal 1448 AH'] },
+      'labour-2027': { fr: ['Fête du Travail', 'Jour férié'], en: ['Labour Day', 'Public Holiday'] },
+      'arafah-2027': { fr: ['Jour d’Arafat 1448', '9 Dhou al-Hijja 1448 H'], en: ['Day of Arafah 1448', '9 Dhu al-Hijjah 1448 AH'] },
+      'adha-2027': { fr: ['Aïd el-Adha 1448 (3 jours)', '10 - 12 Dhou al-Hijja 1448 H'], en: ['Eid al-Adha 1448 (3 days)', '10 - 12 Dhu al-Hijjah 1448 AH'] },
+      'muharram-2027': { fr: ['Nouvel An Hégirien 1449', '1 Mouharram 1449 H'], en: ['Islamic New Year 1449', '1 Muharram 1449 AH'] },
+      'ashura-2027': { fr: ['Achoura 1449', '10 Mouharram 1449 H'], en: ['Day of Ashura 1449', '10 Muharram 1449 AH'] },
+      'indep-2027': { fr: ['Fête de l’Indépendance et de la Jeunesse', 'Fête nationale'], en: ['Independence & Youth Day', 'National Holiday'] },
+      'mawlid-2027': { fr: ['Mawlid Ennabaoui 1449', '12 Rabia al-Awwal 1449 H'], en: ['Mawlid al-Nabi 1449', '12 Rabi al-Awwal 1449 AH'] },
+      'rev-2027': { fr: ['Anniversaire de la Révolution (1er Nov)', 'Fête nationale'], en: ['Revolution Day (Nov 1)', 'National Holiday'] },
+      'ny-2028': { fr: ['Nouvel An 2028', 'Jour férié'], en: ['New Year’s Day 2028', 'Public Holiday'] },
+      'yennayer-2028': { fr: ['Nouvel An Amazigh (Yennayer)', 'Jour férié'], en: ['Amazigh New Year (Yennayer)', 'Public Holiday'] },
+      'ramadan-2028': { fr: ['1er Jour du Ramadan 1449', '1 Ramadan 1449 H'], en: ['First Day of Ramadan 1449', '1 Ramadan 1449 AH'] },
+      'fitr-2028': { fr: ['Aïd el-Fitr 1449 (3 jours)', '1 - 3 Chawwal 1449 H'], en: ['Eid al-Fitr 1449 (3 days)', '1 - 3 Shawwal 1449 AH'] },
+      'labour-2028': { fr: ['Fête du Travail', 'Jour férié'], en: ['Labour Day', 'Public Holiday'] },
+      'arafah-2028': { fr: ['Jour d’Arafat 1449', '9 Dhou al-Hijja 1449 H'], en: ['Day of Arafah 1449', '9 Dhu al-Hijjah 1449 AH'] },
+      'adha-2028': { fr: ['Aïd el-Adha 1449 (3 jours)', '10 - 12 Dhou al-Hijja 1449 H'], en: ['Eid al-Adha 1449 (3 days)', '10 - 12 Dhu al-Hijjah 1449 AH'] },
+      'muharram-2028': { fr: ['Nouvel An Hégirien 1450', '1 Mouharram 1450 H'], en: ['Islamic New Year 1450', '1 Muharram 1450 AH'] },
+      'ashura-2028': { fr: ['Achoura 1450', '10 Mouharram 1450 H'], en: ['Day of Ashura 1450', '10 Muharram 1450 AH'] },
+      'indep-2028': { fr: ['Fête de l’Indépendance et de la Jeunesse', 'Fête nationale'], en: ['Independence & Youth Day', 'National Holiday'] },
+      'mawlid-2028': { fr: ['Mawlid Ennabaoui 1450', '12 Rabia al-Awwal 1450 H'], en: ['Mawlid al-Nabi 1450', '12 Rabi al-Awwal 1450 AH'] },
+      'rev-2028': { fr: ['Anniversaire de la Révolution (1er Nov)', 'Fête nationale'], en: ['Revolution Day (Nov 1)', 'National Holiday'] }
+    };
+
+    function getHolName(h) {
+      const l = (typeof state !== 'undefined' && state.lang) ? state.lang : 'ar';
+      if (l !== 'ar' && HOLIDAY_TRANSLATIONS[h.id] && HOLIDAY_TRANSLATIONS[h.id][l]) {
+        return HOLIDAY_TRANSLATIONS[h.id][l][0];
+      }
+      return h.name;
+    }
+
+    function getHolNote(h) {
+      const l = (typeof state !== 'undefined' && state.lang) ? state.lang : 'ar';
+      if (l !== 'ar' && HOLIDAY_TRANSLATIONS[h.id] && HOLIDAY_TRANSLATIONS[h.id][l]) {
+        return HOLIDAY_TRANSLATIONS[h.id][l][1];
+      }
+      if (String(h.id).startsWith('custom-')) {
+        return tr('مناسبة خاصة', 'Événement personnel', 'Custom Event');
+      }
+      return h.hijriNote || '';
+    }
+
+    // Built-in Holidays Database (2026 - 2028)
+    const BASE_HOLIDAYS = [
+      { id: 'rev-2026', name: 'ذكرى اندلاع الثورة التحريرية', startDate: '2026-11-01', duration: 1, category: 'national', hijriNote: 'عيد وطني رسمي' },
+      { id: 'ny-2027', name: 'رأس السنة الميلادية 2027', startDate: '2027-01-01', duration: 1, category: 'national', hijriNote: 'عطلة رسمية' },
+      { id: 'yennayer-2027', name: 'رأس السنة الأمازيغية (يناير)', startDate: '2027-01-12', duration: 1, category: 'national', hijriNote: 'عطلة رسمية' },
+      { id: 'ramadan-2027', name: 'أول أيام شهر رمضان المبارك 1448', startDate: '2027-02-08', duration: 1, category: 'religious', hijriNote: '1 رمضان 1448 هـ' },
+      { id: 'fitr-2027', name: 'عيد الفطر المبارك 1448 (3 أيام)', startDate: '2027-03-10', duration: 3, category: 'religious', hijriNote: '1 - 3 شوال 1448 هـ' },
+      { id: 'labour-2027', name: 'عيد العمال العالمي', startDate: '2027-05-01', duration: 1, category: 'national', hijriNote: 'عطلة رسمية' },
+      { id: 'arafah-2027', name: 'وقفة عرفة 1448', startDate: '2027-05-16', duration: 1, category: 'religious', hijriNote: '9 ذو الحجة 1448 هـ' },
+      { id: 'adha-2027', name: 'عيد الأضحى المبارك 1448 (3 أيام)', startDate: '2027-05-17', duration: 3, category: 'religious', hijriNote: '10 - 12 ذو الحجة 1448 هـ' },
+      { id: 'muharram-2027', name: 'رأس السنة الهجرية 1449', startDate: '2027-06-06', duration: 1, category: 'religious', hijriNote: '1 محرم 1449 هـ' },
+      { id: 'ashura-2027', name: 'يوم عاشوراء 1449', startDate: '2027-06-15', duration: 1, category: 'religious', hijriNote: '10 محرم 1449 هـ' },
+      { id: 'indep-2027', name: 'عيد الاستقلال والشباب', startDate: '2027-07-05', duration: 1, category: 'national', hijriNote: 'عيد وطني رسمي' },
+      { id: 'mawlid-2027', name: 'المولد النبوي الشريف 1449', startDate: '2027-08-15', duration: 1, category: 'religious', hijriNote: '12 ربيع الأول 1449 هـ' },
+      { id: 'rev-2027', name: 'ذكرى اندلاع الثورة التحريرية', startDate: '2027-11-01', duration: 1, category: 'national', hijriNote: 'عيد وطني رسمي' },
+      { id: 'ny-2028', name: 'رأس السنة الميلادية 2028', startDate: '2028-01-01', duration: 1, category: 'national', hijriNote: 'عطلة رسمية' },
+      { id: 'yennayer-2028', name: 'رأس السنة الأمازيغية (يناير)', startDate: '2028-01-12', duration: 1, category: 'national', hijriNote: 'عطلة رسمية' },
+      { id: 'ramadan-2028', name: 'أول أيام شهر رمضان المبارك 1449', startDate: '2028-01-28', duration: 1, category: 'religious', hijriNote: '1 رمضان 1449 هـ' },
+      { id: 'fitr-2028', name: 'عيد الفطر المبارك 1449 (3 أيام)', startDate: '2028-02-27', duration: 3, category: 'religious', hijriNote: '1 - 3 شوال 1449 هـ' },
+      { id: 'labour-2028', name: 'عيد العمال العالمي', startDate: '2028-05-01', duration: 1, category: 'national', hijriNote: 'عطلة رسمية' },
+      { id: 'arafah-2028', name: 'وقفة عرفة 1449', startDate: '2028-05-04', duration: 1, category: 'religious', hijriNote: '9 ذو الحجة 1449 هـ' },
+      { id: 'adha-2028', name: 'عيد الأضحى المبارك 1449 (3 أيام)', startDate: '2028-05-05', duration: 3, category: 'religious', hijriNote: '10 - 12 ذو الحجة 1449 هـ' },
+      { id: 'muharram-2028', name: 'رأس السنة الهجرية 1450', startDate: '2028-05-25', duration: 1, category: 'religious', hijriNote: '1 محرم 1450 هـ' },
+      { id: 'ashura-2028', name: 'يوم عاشوراء 1450', startDate: '2028-06-03', duration: 1, category: 'religious', hijriNote: '10 محرم 1450 هـ' },
+      { id: 'indep-2028', name: 'عيد الاستقلال والشباب', startDate: '2028-07-05', duration: 1, category: 'national', hijriNote: 'عيد وطني رسمي' },
+      { id: 'mawlid-2028', name: 'المولد النبوي الشريف 1450', startDate: '2028-08-03', duration: 1, category: 'religious', hijriNote: '12 ربيع الأول 1450 هـ' },
+      { id: 'rev-2028', name: 'ذكرى اندلاع الثورة التحريرية', startDate: '2028-11-01', duration: 1, category: 'national', hijriNote: 'عيد وطني رسمي' }
+    ];
+
+    const todayDate = getSystemToday();
+    const defaultStartDate = formatYMD(addDays(todayDate, -3)); // Default 2026-10-20
+
+    let state = {
+      startDateStr: defaultStartDate,
+      workDays: 28,
+      homeDays: 28,
+      workMode: 'poste', // 'poste' | 'surface'
+      posteOrder: 'night_first', // 'night_first' | 'day_first'
+      posteSegmentsStr: '14,14', // Flexible segments e.g. '14,14' or '7,14,7' or '7,7,7,7'
+      hijriOffset: 0, // -3 to +3 days global Hijri adjustment
+      holidayDateOverrides: {}, // Per-holiday manual start date override { [holidayId]: 'YYYY-MM-DD' }
+      holidayFilter: 'all',
+      openHolidayDrawer: null, // null | 'home' | 'work'
+      openUpcomingHolidaysDrawer: false,
+      openCyclesDrawer: false,
+      ramadanSelectedId: 'ramadan-2027',
+      ramadanDaysCount: 30,
+      openRamadanDrawer: false,
+      adhaSelectedYear: '2027',
+      openAdhaDrawer: false,
+      lang: 'ar',
+      posteDayStart: '05:50',
+      posteDayEnd: '18:00',
+      posteNightStart: '17:50',
+      posteNightEnd: '06:00',
+      surfaceMorningStart: '06:50',
+      surfaceMorningEnd: '11:45',
+      surfaceAfternoonStart: '12:50',
+      surfaceAfternoonEnd: '18:50',
+      activeTab: 'dashboard',
+      calYear: todayDate.getFullYear(),
+      calMonth: todayDate.getMonth(),
+      customHolidays: []
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('amali_rotational_state_v3');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state = {
+            ...state,
+            ...parsed,
+            holidayDateOverrides: parsed.holidayDateOverrides || {}
+          };
+        }
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('amali_rotational_state_v3', JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    // Parse flexible Poste segments array so it always covers workLen days cleanly
+    function getNormalizedPosteSegments(workLen, phaseStartDate) {
+      const half = Math.floor(workLen / 2);
+      const lengths = [half, workLen - half];
+      const normalized = [];
+      let accumulated = 0;
+
+      for (let i = 0; i < lengths.length; i++) {
+        if (accumulated >= workLen) break;
+        const take = Math.min(lengths[i], workLen - accumulated);
+        normalized.push(take);
+        accumulated += take;
+      }
+
+      if (accumulated < workLen) {
+        normalized.push(workLen - accumulated);
+      }
+
+      const firstIsNight = state.posteOrder !== 'day_first';
+      let dayCursor = 1;
+
+      return normalized.map((len, idx) => {
+        const isNight = (idx % 2 === 0) ? firstIsNight : !firstIsNight;
+        const startDayNum = dayCursor;
+        const endDayNum = dayCursor + len - 1;
+        const segStartDate = addDays(phaseStartDate, startDayNum - 1);
+        const segEndDate = addDays(phaseStartDate, endDayNum - 1);
+        dayCursor += len;
+        return {
+          index: idx,
+          length: len,
+          isNight,
+          startDayNum,
+          endDayNum,
+          segStartDate,
+          segEndDate,
+          title: isNight ? tr('بوسط ليلي 🌙', 'Poste Nuit 🌙', 'Night Shift 🌙') : tr('بوسط نهاري ☀️', 'Poste Jour ☀️', 'Day Shift ☀️'),
+          shortTitle: isNight ? tr(`${len} يوم ليلاً 🌙`, `${len} j Nuit 🌙`, `${len} d Night 🌙`) : tr(`${len} يوم نهاراً ☀️`, `${len} j Jour ☀️`, `${len} d Day ☀️`)
+        };
+      });
+    }
+
+    // Core Math: Calculate Rotation & Shift Status (Poste with flexible segments vs Surface) for any Target Date
+    function getStatusForDate(targetDate) {
+      const anchorDate = parseYMD(state.startDateStr);
+      const workLen = Math.max(2, parseInt(state.workDays, 10) || 28);
+      const homeLen = Math.max(1, parseInt(state.homeDays, 10) || 28);
+      const cycleLen = workLen + homeLen;
+
+      const delta = diffDays(targetDate, anchorDate);
+      const pos = ((delta % cycleLen) + cycleLen) % cycleLen;
+
+      const isWork = pos < workLen;
+      const dayInPhase = isWork ? (pos + 1) : (pos - workLen + 1);
+      const phaseTotal = isWork ? workLen : homeLen;
+      const daysRemaining = isWork ? (workLen - pos) : (cycleLen - pos);
+
+      const phaseStartDate = addDays(targetDate, -(dayInPhase - 1));
+      const switchDate = addDays(targetDate, daysRemaining);
+      const nextSwitchAfterThat = addDays(switchDate, isWork ? homeLen : workLen);
+
+      const segments = getNormalizedPosteSegments(workLen, phaseStartDate);
+
+      let shiftType = 'home'; // 'home' | 'poste_night' | 'poste_day' | 'surface_day'
+      let shiftLabel = tr('عطلة في البيت 🏠', 'Congé à la maison 🏠', 'Home Leave 🏠');
+      let shiftHoursText = tr('راحة كاملة في البيت', 'Repos complet à la maison', 'Full rest at home');
+      let isChangeoverRestDay = false;
+      let currentSegment = null;
+      let nextSegment = null;
+      let subPhaseDay = dayInPhase;
+      let subPhaseTotal = phaseTotal;
+      let daysUntilShiftChange = 0;
+
+      const pDayIn = state.posteDayStart || '05:50';
+      const pDayOut = state.posteDayEnd || '18:00';
+      const pNightIn = state.posteNightStart || '17:50';
+      const pNightOut = state.posteNightEnd || '06:00';
+      const sMornIn = state.surfaceMorningStart || '06:50';
+      const sMornOut = state.surfaceMorningEnd || '11:45';
+      const sAftIn = state.surfaceAfternoonStart || '12:50';
+      const sAftOut = state.surfaceAfternoonEnd || '18:50';
+
+      if (isWork) {
+        if (state.workMode === 'surface') {
+          shiftType = 'surface_day';
+          shiftLabel = tr('سورفاس نهاري ☀️', 'Surface Jour ☀️', 'Surface Day ☀️');
+          shiftHoursText = `${sMornIn} - ${sMornOut} | ${sAftIn} - ${sAftOut}`;
+          subPhaseDay = dayInPhase;
+          subPhaseTotal = workLen;
+        } else {
+          for (let i = 0; i < segments.length; i++) {
+            const seg = segments[i];
+            if (dayInPhase >= seg.startDayNum && dayInPhase <= seg.endDayNum) {
+              currentSegment = seg;
+              nextSegment = (i + 1 < segments.length) ? segments[i + 1] : null;
+              break;
+            }
+          }
+
+          if (!currentSegment) currentSegment = segments[segments.length - 1];
+
+          subPhaseDay = dayInPhase - currentSegment.startDayNum + 1;
+          subPhaseTotal = currentSegment.length;
+          daysUntilShiftChange = nextSegment ? (currentSegment.endDayNum - dayInPhase + 1) : 0;
+
+          if (currentSegment.index > 0 && dayInPhase === currentSegment.startDayNum) {
+            isChangeoverRestDay = true;
+          }
+
+          if (currentSegment.isNight) {
+            shiftType = 'poste_night';
+            shiftLabel = isChangeoverRestDay
+              ? tr('تبديل البوسط (راحة 24 سا 🔄 ثم ليل 🌙)', 'Changement Poste (24h repos 🔄 puis Nuit 🌙)', 'Shift Change (24h rest 🔄 then Night 🌙)')
+              : tr('بوسط ليلي 🌙', 'Poste Nuit 🌙', 'Night Shift 🌙');
+            shiftHoursText = tr(`دخول ${pNightIn} ← خروج ${pNightOut}`, `Entrée ${pNightIn} → Sortie ${pNightOut}`, `In ${pNightIn} → Out ${pNightOut}`);
+          } else {
+            shiftType = 'poste_day';
+            shiftLabel = isChangeoverRestDay
+              ? tr('تبديل البوسط (راحة 24 سا 🔄 ثم نهار ☀️)', 'Changement Poste (24h repos 🔄 puis Jour ☀️)', 'Shift Change (24h rest 🔄 then Day ☀️)')
+              : tr('بوسط نهاري ☀️', 'Poste Jour ☀️', 'Day Shift ☀️');
+            shiftHoursText = tr(`دخول ${pDayIn} ← خروج ${pDayOut}`, `Entrée ${pDayIn} → Sortie ${pDayOut}`, `In ${pDayIn} → Out ${pDayOut}`);
+          }
+        }
+      }
+
+      return {
+        isWork,
+        dayInPhase,
+        phaseTotal,
+        daysRemaining,
+        phaseStartDate,
+        switchDate,
+        nextSwitchAfterThat,
+        progressPct: Math.round((dayInPhase / phaseTotal) * 100),
+        segments,
+        currentSegment,
+        nextSegment,
+        shiftType,
+        shiftLabel,
+        shiftHoursText,
+        isChangeoverRestDay,
+        subPhaseDay,
+        subPhaseTotal,
+        daysUntilShiftChange
+      };
+    }
+
+    // Evaluate multi-day holiday against work/home rotation & shift type
+    function evaluateHoliday(holiday) {
+      const overrides = state.holidayDateOverrides || {};
+      const hasManualOverride = Boolean(overrides[holiday.id]);
+
+      let start;
+      if (hasManualOverride) {
+        start = parseYMD(overrides[holiday.id]);
+      } else {
+        const offset = holiday.category === 'religious' ? (state.hijriOffset || 0) : 0;
+        start = addDays(parseYMD(holiday.startDate), offset);
+      }
+
+      const dur = Math.max(1, parseInt(holiday.duration, 10) || 1);
+
+      let homeCount = 0;
+      let workCount = 0;
+      const dayBreakdown = [];
+
+      for (let i = 0; i < dur; i++) {
+        const d = addDays(start, i);
+        const st = getStatusForDate(d);
+        if (st.isWork) {
+          workCount++;
+        } else {
+          homeCount++;
+        }
+        dayBreakdown.push({
+          date: d,
+          isWork: st.isWork,
+          dayInPhase: st.dayInPhase,
+          shiftType: st.shiftType,
+          shiftLabel: st.shiftLabel,
+          shiftHoursText: st.shiftHoursText
+        });
+      }
+
+      let statusType = 'home';
+      if (homeCount === dur) statusType = 'home';
+      else if (workCount === dur) statusType = 'work';
+      else statusType = 'mixed';
+
+      const daysFromToday = diffDays(start, getSystemToday());
+
+      return {
+        ...holiday,
+        hasManualOverride,
+        effectiveStartDate: start,
+        effectiveEndDate: addDays(start, dur - 1),
+        homeCount,
+        workCount,
+        statusType,
+        dayBreakdown,
+        daysFromToday
+      };
+    }
+
+    function getAllHolidaysEvaluated() {
+      const combined = [...BASE_HOLIDAYS, ...(state.customHolidays || [])];
+      const evaluated = combined.map(evaluateHoliday);
+      evaluated.sort((a, b) => a.effectiveStartDate - b.effectiveStartDate);
+      return evaluated;
+    }
+
+    // --- UI Rendering Functions ---
+    function applyLanguageUI() {
+      const l = state.lang || 'ar';
+      document.documentElement.lang = l;
+      document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+
+      document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+        const isAct = btn.getAttribute('data-lang-set') === l;
+        btn.className = isAct
+          ? 'lang-switch-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition bg-amber-500 text-slate-950 shadow'
+          : 'lang-switch-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition text-slate-300 hover:text-white';
+      });
+
+      // Header App Title
+      const appTitleH1 = document.querySelector('header h1');
+      if (appTitleH1) appTitleH1.textContent = tr('عملي', 'Mon Travail', 'My Work');
+      document.title = tr('عملي', 'Mon Travail', 'My Work');
+
+      // Top setup bar & work mode options
+      const setupSpan = document.querySelector('main > section span.text-amber-400');
+      const setupH2 = document.querySelector('main > section h2');
+      if (setupSpan) setupSpan.textContent = tr('ضبط بداية المناوبة ونظام العمل', 'Configuration du début de rotation', 'Rotation Start & Shift Mode');
+      if (setupH2) setupH2.textContent = tr('حدد تاريخ دخولك للعمل وطريقة الدوام', 'Choisissez votre date d’entrée et le système', 'Select your work entry date & shift mode');
+
+      const pDayIn = state.posteDayStart || '05:50';
+      const pNightIn = state.posteNightStart || '17:50';
+      const sMornIn = state.surfaceMorningStart || '06:50';
+      const sMornOut = state.surfaceMorningEnd || '11:45';
+      const sAftIn = state.surfaceAfternoonStart || '12:50';
+      const sAftOut = state.surfaceAfternoonEnd || '18:50';
+
+      const qSelect = document.getElementById('quickWorkModeSelect');
+      if (qSelect && qSelect.options.length >= 2) {
+        qSelect.options[0].textContent = tr(`🔄 بوسط (دخول ${pDayIn} / ${pNightIn})`, `🔄 Poste (Entrée ${pDayIn} / ${pNightIn})`, `🔄 Poste (In ${pDayIn} / ${pNightIn})`);
+        qSelect.options[1].textContent = tr(`☀️ سورفاس (${sMornIn}-${sMornOut} | ${sAftIn}-${sAftOut})`, `☀️ Surface (${sMornIn}-${sMornOut} | ${sAftIn}-${sAftOut})`, `☀️ Surface (${sMornIn}-${sMornOut} | ${sAftIn}-${sAftOut})`);
+      }
+
+      const sSelect = document.getElementById('settingWorkModeSelect');
+      if (sSelect && sSelect.options.length >= 2) {
+        sSelect.options[0].textContent = tr(`🔄 نظام بوسط (دخول ${pDayIn} / ${pNightIn})`, `🔄 Système Poste (Entrée ${pDayIn} / ${pNightIn})`, `🔄 Poste Mode (In ${pDayIn} / ${pNightIn})`);
+        sSelect.options[1].textContent = tr(`☀️ نظام سورفاس (${sMornIn}-${sMornOut} | ${sAftIn}-${sAftOut})`, `☀️ Système Surface (${sMornIn}-${sMornOut} | ${sAftIn}-${sAftOut})`, `☀️ Surface Mode (${sMornIn}-${sMornOut} | ${sAftIn}-${sAftOut})`);
+      }
+
+      const btnToday = document.getElementById('btnSetTodayStart');
+      if (btnToday) btnToday.textContent = tr('بدأت اليوم', 'Commencé aujourd’hui', 'Started Today');
+
+      const tabNamesDesktop = {
+        dashboard: tr('العداد والحالة', 'Compteur & Statut', 'Counter & Status'),
+        holidays: tr('الأعياد والمناسبات', 'Fêtes & Événements', 'Holidays & Events'),
+        calendar: tr('الرزنامة وفحص تاريخ', 'Calendrier & Vérif.', 'Calendar & Checker'),
+        settings: tr('إعدادات المناوبة', 'Paramètres', 'Settings')
+      };
+      const tabNamesMobile = {
+        dashboard: tr('العداد', 'Compteur', 'Counter'),
+        holidays: tr('الأعياد', 'Fêtes', 'Holidays'),
+        calendar: tr('الرزنامة', 'Calendrier', 'Calendar'),
+        settings: tr('الإعدادات', 'Paramètres', 'Settings')
+      };
+
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        const tId = btn.getAttribute('data-tab');
+        const span = btn.querySelector('span');
+        if (span && tId) {
+          span.textContent = btn.closest('.md\\:grid') ? tabNamesDesktop[tId] : tabNamesMobile[tId];
+        }
+      });
+
+      // Hero Card static labels
+      const pStartLbl = document.getElementById('progressStartLabel');
+      const pEndLbl = document.getElementById('progressEndLabel');
+      if (pStartLbl) pStartLbl.textContent = tr('بداية الفترة', 'Début de période', 'Period Start');
+      if (pEndLbl) pEndLbl.textContent = tr('موعد التبديل', 'Date de changement', 'Switch Date');
+
+      const cardPhaseStartEl = document.getElementById('cardPhaseStart');
+      if (cardPhaseStartEl && cardPhaseStartEl.previousElementSibling) {
+        cardPhaseStartEl.previousElementSibling.textContent = tr('بداية هذه الفترة', 'Début de cette période', 'Current Period Start');
+      }
+      const cardHolRatioEl = document.getElementById('cardHolidaysAtHomeRatio');
+      if (cardHolRatioEl && cardHolRatioEl.previousElementSibling) {
+        cardHolRatioEl.previousElementSibling.textContent = tr('الأعياد القادمة في البيت', 'Fêtes à la maison', 'Holidays at Home');
+      }
+
+      // Ramadan Card static labels
+      const ramBtnH3 = document.querySelector('#btnToggleRamadanDrawer h3');
+      if (ramBtnH3) ramBtnH3.textContent = tr('رمضان', 'Ramadan', 'Ramadan');
+      const ramYearSel = document.getElementById('ramadanYearSelect');
+      if (ramYearSel && ramYearSel.options.length >= 2) {
+        ramYearSel.options[0].textContent = tr('1448 هـ (2027)', '1448 H (2027)', '1448 AH (2027)');
+        ramYearSel.options[1].textContent = tr('1449 هـ (2028)', '1449 H (2028)', '1449 AH (2028)');
+      }
+      const ramDaysSel = document.getElementById('ramadanDaysCountSelect');
+      if (ramDaysSel && ramDaysSel.options.length >= 2) {
+        ramDaysSel.options[0].textContent = tr('30 يوم', '30 jours', '30 days');
+        ramDaysSel.options[1].textContent = tr('29 يوم', '29 jours', '29 days');
+      }
+      const ramHomeBig = document.getElementById('ramadanHomeDaysBig');
+      if (ramHomeBig && ramHomeBig.previousElementSibling) {
+        ramHomeBig.previousElementSibling.textContent = tr('صيام في البيت 🏠', 'Jeûne à la maison 🏠', 'Fasting at Home 🏠');
+      }
+      const ramWorkBig = document.getElementById('ramadanWorkDaysBig');
+      if (ramWorkBig && ramWorkBig.previousElementSibling) {
+        ramWorkBig.previousElementSibling.textContent = tr('صيام في العمل 👷', 'Jeûne au travail 👷', 'Fasting at Work 👷');
+      }
+      const ramTableHead = document.getElementById('ramadanPeriodsBreakdownList')?.previousElementSibling;
+      if (ramTableHead && ramTableHead.children.length >= 3) {
+        ramTableHead.children[0].textContent = tr('الفترة والدوام', 'Période & Poste', 'Period & Shift');
+        ramTableHead.children[1].textContent = tr('من متى إلى متى', 'Du ... au ...', 'From ... to ...');
+        ramTableHead.children[2].textContent = tr('عدد الأيام', 'Jours', 'Days');
+      }
+
+      // Eid Al-Adha Card static labels
+      const adhaBtnH3 = document.querySelector('#btnToggleAdhaDrawer h3');
+      if (adhaBtnH3) adhaBtnH3.textContent = tr('عيد الأضحى', 'Aïd el-Adha', 'Eid al-Adha');
+      const adhaYearSel = document.getElementById('adhaYearSelect');
+      if (adhaYearSel && adhaYearSel.options.length >= 2) {
+        adhaYearSel.options[0].textContent = tr('1448 هـ (2027)', '1448 H (2027)', '1448 AH (2027)');
+        adhaYearSel.options[1].textContent = tr('1449 هـ (2028)', '1449 H (2028)', '1449 AH (2028)');
+      }
+      const adhaTableHead = document.getElementById('adhaDaysBreakdownList')?.previousElementSibling;
+      if (adhaTableHead && adhaTableHead.children.length >= 3) {
+        adhaTableHead.children[0].textContent = tr('اليوم', 'Jour', 'Day');
+        adhaTableHead.children[1].textContent = tr('التاريخ', 'Date', 'Date');
+        adhaTableHead.children[2].textContent = tr('الحالة', 'Statut', 'Status');
+      }
+
+      // Upcoming Holidays Drawer static labels
+      const upHolH3 = document.querySelector('#btnToggleUpcomingHolidaysDrawer h3');
+      if (upHolH3) upHolH3.textContent = tr('أقرب المناسبات الدينية والأعياد القادمة', 'Prochaines fêtes religieuses et nationales', 'Upcoming Religious & National Holidays');
+      const btnViewAllHol = document.getElementById('btnViewAllHolidays');
+      if (btnViewAllHol) {
+        btnViewAllHol.textContent = tr('عرض كل الأعياد ←', 'Voir toutes les fêtes →', 'View all holidays →');
+        if (btnViewAllHol.previousElementSibling) {
+          btnViewAllHol.previousElementSibling.textContent = tr('أقرب 6 مناسبات وأعياد قادمة (في البيت أم في العمل):', 'Les 6 prochaines fêtes (Maison ou Travail) :', 'Next 6 upcoming holidays (Home or Work):');
+        }
+      }
+
+      // Upcoming Cycles Drawer static labels
+      const cycBtnH3 = document.querySelector('#btnToggleCyclesDrawer h3');
+      const cycBtnP = document.querySelector('#btnToggleCyclesDrawer p');
+      if (cycBtnH3) cycBtnH3.textContent = tr('جدول الدورات القادمة (مواعيد الطلوع والنزول)', 'Calendrier des prochains cycles (Travail & Congé)', 'Upcoming Rotation Cycles (Work & Leave)');
+      if (cycBtnP) cycBtnP.textContent = tr('اضغط هنا لفتح وعرض تواريخ الدورات الـ 8 القادمة', 'Cliquez ici pour afficher les 8 prochains cycles', 'Click here to view the next 8 rotation cycles');
+      const cycThs = document.querySelectorAll('#rotationCyclesDrawerBox thead th');
+      if (cycThs.length >= 5) {
+        cycThs[0].textContent = tr('الدورة', 'Cycle', 'Cycle');
+        cycThs[1].textContent = tr('الحالة ونظام الدوام', 'Statut & Système', 'Status & Shift');
+        cycThs[2].textContent = tr('من تاريخ (البداية)', 'Date de début', 'Start Date');
+        cycThs[3].textContent = tr('إلى تاريخ (النهاية)', 'Date de fin', 'End Date');
+        cycThs[4].textContent = tr('المدة', 'Durée', 'Duration');
+      }
+
+      // Tab 2: Holidays static labels
+      const homeCardSpan = document.querySelector('#btnToggleHomeHolidaysDrawer > span:first-child');
+      const homeHintSpan = document.querySelector('#homeDrawerHintLabel > span:first-child');
+      if (homeCardSpan) homeCardSpan.textContent = tr('أعياد ومناسبات في البيت 🏠', 'Fêtes à la maison 🏠', 'Holidays at Home 🏠');
+      if (homeHintSpan) homeHintSpan.textContent = tr('اضغط لعرض القائمة', 'Cliquez pour afficher', 'Click to view list');
+
+      const workCardSpan = document.querySelector('#btnToggleWorkHolidaysDrawer > span:first-child');
+      const workHintSpan = document.querySelector('#workDrawerHintLabel > span:first-child');
+      if (workCardSpan) workCardSpan.textContent = tr('أعياد ومناسبات في العمل 👷', 'Fêtes au travail 👷', 'Holidays at Work 👷');
+      if (workHintSpan) workHintSpan.textContent = tr('اضغط لعرض القائمة', 'Cliquez pour afficher', 'Click to view list');
+
+      const homeDrawerH4 = document.querySelector('#homeHolidaysDrawerBox h4');
+      const workDrawerH4 = document.querySelector('#workHolidaysDrawerBox h4');
+      const btnCloseHome = document.getElementById('btnCloseHomeDrawer');
+      const btnCloseWork = document.getElementById('btnCloseWorkDrawer');
+      if (homeDrawerH4) homeDrawerH4.textContent = tr('🏠 قائمة الأعياد والمناسبات التي تصادف عطلتك في البيت', '🏠 Fêtes coïncidant avec votre congé à la maison', '🏠 Holidays falling during your home leave');
+      if (workDrawerH4) workDrawerH4.textContent = tr('👷 قائمة الأعياد والمناسبات التي تصادف فترة عملك', '👷 Fêtes coïncidant avec votre période de travail', '👷 Holidays falling during your work period');
+      if (btnCloseHome) btnCloseHome.textContent = tr('إغلاق ✕', 'Fermer ✕', 'Close ✕');
+      if (btnCloseWork) btnCloseWork.textContent = tr('إغلاق ✕', 'Fermer ✕', 'Close ✕');
+
+      const filterTextMap = {
+        all: tr('الكل', 'Tout', 'All'),
+        religious: tr('الأعياد الدينية 🌙', 'Fêtes religieuses 🌙', 'Religious 🌙'),
+        national: tr('الأعياد الوطنية 🇩🇿', 'Fêtes nationales 🇩🇿', 'National 🇩🇿'),
+        home: tr('في البيت فقط 🏠', 'À la maison 🏠', 'At Home 🏠'),
+        work: tr('في العمل فقط 👷', 'Au travail 👷', 'At Work 👷')
+      };
+      document.querySelectorAll('.holiday-filter-btn').forEach(btn => {
+        const fk = btn.getAttribute('data-hfilter');
+        if (fk && filterTextMap[fk]) btn.textContent = filterTextMap[fk];
+      });
+
+      const btnAddCustom = document.querySelector('#btnOpenAddCustomModal span');
+      if (btnAddCustom) btnAddCustom.textContent = tr('+ إضافة مناسبة خاصة', '+ Ajouter un événement', '+ Add Custom Event');
+
+      // Custom Event Modal labels
+      const modalH3 = document.querySelector('#customEventModal h3');
+      const lblEvName = document.querySelector('label[for="customEventName"]');
+      const inpEvName = document.getElementById('customEventName');
+      const lblEvStart = document.querySelector('label[for="customEventStart"]');
+      const lblEvDays = document.querySelector('label[for="customEventDays"]');
+      const btnCancelEv = document.getElementById('btnCancelCustomModal');
+      const btnSaveEv = document.getElementById('btnSaveCustomEvent');
+      if (modalH3) modalH3.textContent = tr('إضافة مناسبة أو موعد خاص', 'Ajouter un événement personnel', 'Add Custom Event');
+      if (lblEvName) lblEvName.textContent = tr('اسم المناسبة (مثال: زفاف، سفر، عطلة عائلية)', 'Nom de l’événement (ex: Mariage, Voyage)', 'Event Name (e.g. Wedding, Trip)');
+      if (inpEvName) inpEvName.placeholder = tr('أدخل اسم المناسبة...', 'Entrez le nom...', 'Enter event name...');
+      if (lblEvStart) lblEvStart.textContent = tr('تاريخ البداية', 'Date de début', 'Start Date');
+      if (lblEvDays) lblEvDays.textContent = tr('عدد الأيام', 'Nombre de jours', 'Number of Days');
+      if (btnCancelEv) btnCancelEv.textContent = tr('إلغاء', 'Annuler', 'Cancel');
+      if (btnSaveEv) btnSaveEv.textContent = tr('حفظ المناسبة', 'Enregistrer', 'Save Event');
+
+      // Tab 3: Calendar & Date Checker labels
+      const calCheckerBox = document.querySelector('#tab-calendar > div:first-child');
+      if (calCheckerBox) {
+        const h3 = calCheckerBox.querySelector('h3');
+        const p = calCheckerBox.querySelector('p');
+        if (h3) h3.textContent = tr('فاحص التواريخ السريع 🔍', 'Vérificateur de date rapide 🔍', 'Quick Date Checker 🔍');
+        if (p) p.textContent = tr('اختر أي تاريخ مستقبلي لمعرفة إن كنت ستكون في البيت أم في العمل ونوع دوامك', 'Choisissez une date pour savoir si vous serez à la maison ou au travail', 'Pick any future date to see if you will be at home or at work');
+      }
+      const btnJumpToday = document.getElementById('calJumpTodayBtn');
+      if (btnJumpToday) btnJumpToday.textContent = tr('العودة لشهر اليوم', 'Revenir au mois actuel', 'Jump to current month');
+
+      const calBox = document.querySelector('#tab-calendar > div:nth-child(2)');
+      if (calBox) {
+        const legendSpans = calBox.querySelectorAll('.flex-wrap span.text-slate-300');
+        if (legendSpans.length >= 4) {
+          legendSpans[0].textContent = tr('عمل ليلي 🌙', 'Travail Nuit 🌙', 'Night Work 🌙');
+          legendSpans[1].textContent = tr('عمل نهاري ☀️', 'Travail Jour ☀️', 'Day Work ☀️');
+          legendSpans[2].textContent = tr('عطلة بالبيت 🏠', 'Congé Maison 🏠', 'Home Leave 🏠');
+          legendSpans[3].textContent = tr('عيد / مناسبة ⭐', 'Fête / Événement ⭐', 'Holiday / Event ⭐');
+        }
+        const weekGrid = document.getElementById('calendarDaysGrid')?.previousElementSibling;
+        if (weekGrid && weekGrid.children.length === 7) {
+          const shortDays = l === 'fr'
+            ? ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+            : (l === 'en' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : DAYS_BY_LANG.ar);
+          for (let i = 0; i < 7; i++) {
+            weekGrid.children[i].textContent = shortDays[i];
+          }
+        }
+      }
+
+      // Settings labels
+      const secASpan = document.getElementById('settingWorkModeSelect')?.previousElementSibling;
+      if (secASpan) secASpan.textContent = tr('نظام الدوام وتقسيم فترات البوسط', 'Système de travail et périodes de Poste', 'Work Mode & Poste Shift Periods');
+
+      const hijriBox = document.getElementById('settingsHijriTodayPreview')?.parentElement;
+      if (hijriBox) {
+        const hSpan = hijriBox.querySelector('span.text-sky-400');
+        const hP = hijriBox.querySelector('p');
+        if (hSpan) hSpan.textContent = tr('🌙 ضبط وتعديل التقويم الهجري والأعياد الدينية', '🌙 Ajustement du calendrier Hégirien', '🌙 Hijri Calendar Adjustment');
+        if (hP) hP.textContent = tr('يمكنك تقديم أو تأخير التقويم الهجري العام حسب رؤية الهلال', 'Ajustez le calendrier Hégirien (+ / - jours) selon l’observation lunaire', 'Adjust the Hijri calendar (+ / - days) based on moon sighting');
+      }
+      const hijriOffsetLbl = document.getElementById('settingsHijriOffsetBadge')?.previousElementSibling;
+      if (hijriOffsetLbl) hijriOffsetLbl.textContent = tr('الضبط العام للتقويم الهجري (تقديم / تأخير الهلال):', 'Décalage du calendrier Hégirien (jours) :', 'Global Hijri Calendar Offset (days):');
+
+      const presetLbl = document.querySelector('label[for="commonRotationPresetSelect"]');
+      if (presetLbl) presetLbl.textContent = tr('أنظمة مناوبة شائعة (اختر من الشريط المنبثق):', 'Systèmes de rotation courants :', 'Common Rotation Presets:');
+      const presetSel = document.getElementById('commonRotationPresetSelect');
+      if (presetSel && presetSel.options.length >= 5) {
+        presetSel.options[0].textContent = tr('4 أسابيع عمل × 4 أسابيع عطلة (28 / 28)', '4 sem. travail × 4 sem. congé (28 / 28)', '4 weeks work × 4 weeks leave (28 / 28)');
+        presetSel.options[1].textContent = tr('3 أسابيع عمل × 3 أسابيع عطلة (21 / 21)', '3 sem. travail × 3 sem. congé (21 / 21)', '3 weeks work × 3 weeks leave (21 / 21)');
+        presetSel.options[2].textContent = tr('5 أسابيع عمل × 5 أسابيع عطلة (35 / 35)', '5 sem. travail × 5 sem. congé (35 / 35)', '5 weeks work × 5 weeks leave (35 / 35)');
+        presetSel.options[3].textContent = tr('6 أسابيع عمل × 3 أسابيع عطلة (42 / 21)', '6 sem. travail × 3 sem. congé (42 / 21)', '6 weeks work × 3 weeks leave (42 / 21)');
+        presetSel.options[4].textContent = tr('أسبوعان عمل × أسبوعان عطلة (14 / 14)', '2 sem. travail × 2 sem. congé (14 / 14)', '2 weeks work × 2 weeks leave (14 / 14)');
+      }
+
+      const setMap = {
+        settingsMainTitle: tr('إعدادات نظام المناوبة والتقويم الهجري', 'Paramètres de Rotation, Langue & Horaires', 'Rotation, Language & Shift Time Settings'),
+        settingsMainSubtitle: tr('تحكم في اللغة، وأوقات الدخول والخروج، ونظام المناوبة، والتقويم الهجري.', 'Gérez la langue, les heures d’entrée/sortie, le système de poste et le calendrier.', 'Manage language, entry/exit times, shift mode, and Hijri calendar.'),
+        lblPosteStartOrder: tr('بماذا تبدأ أول فترة في مناوبة البوسط؟', 'Par quoi commence votre première période de Poste ?', 'Which shift starts your Poste rotation?'),
+        btnPosteNightFirst: tr('🌙 أبدأ بالليل أولاً ثم أتبدل للنهار', '🌙 Commencer par Nuit puis passer au Jour', '🌙 Start with Night shift then switch to Day'),
+        btnPosteDayFirst: tr('☀️ أبدأ بالنهار أولاً ثم أتبدل لليل', '☀️ Commencer par Jour puis passer à la Nuit', '☀️ Start with Day shift then switch to Night'),
+        lblCustomShiftTimesTitle: tr('⏰ تعديل وقت الدخول والخروج (البوسط والسورفاس)', '⏰ Modifier les heures d’entrée et de sortie (Poste & Surface)', '⏰ Edit Entry & Exit Times (Poste & Surface)'),
+        lblPosteTimesSub: tr('🔄 مواقيت نظام البوسط (Poste):', '🔄 Horaires du système Poste :', '🔄 Poste Shift Hours:'),
+        lblPosteDayIn: tr('دخول النهار ☀️', 'Entrée Jour ☀️', 'Day Entry ☀️'),
+        lblPosteDayOut: tr('خروج النهار ☀️', 'Sortie Jour ☀️', 'Day Exit ☀️'),
+        lblPosteNightIn: tr('دخول الليل 🌙', 'Entrée Nuit 🌙', 'Night Entry 🌙'),
+        lblPosteNightOut: tr('خروج الليل 🌙', 'Sortie Nuit 🌙', 'Night Exit 🌙'),
+        lblSurfaceTimesSub: tr('☀️ مواقيت نظام السورفاس (Surface):', '☀️ Horaires du système Surface :', '☀️ Surface Shift Hours:'),
+        lblSurfMornIn: tr('دخول الصباح', 'Entrée Matin', 'Morning Entry'),
+        lblSurfMornOut: tr('خروج الغذاء', 'Sortie Midi', 'Lunch Exit'),
+        lblSurfAftIn: tr('رجوع المساء', 'Retour Après-midi', 'Afternoon Return'),
+        lblSurfAftOut: tr('خروج المساء', 'Sortie Soir', 'Evening Exit'),
+        settingsSavedNotice: tr('يتم حفظ جميع تعديلاتك تلقائياً على جهازك.', 'Vos modifications sont enregistrées automatiquement.', 'All changes are saved automatically on your device.'),
+        btnResetDefaults: tr('إعادة الضبط الافتراضي', 'Réinitialiser par défaut', 'Reset to Defaults')
+      };
+      Object.entries(setMap).forEach(([id, txt]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = txt;
+      });
+    }
+
+    function renderAll() {
+      applyLanguageUI();
+      document.getElementById('quickStartDateInput').value = state.startDateStr;
+      document.getElementById('quickWorkModeSelect').value = state.workMode;
+      document.getElementById('settingWorkModeSelect').value = state.workMode;
+
+      // Sync custom shift time inputs
+      const timeFields = [
+        ['timePosteDayStart', 'posteDayStart', '05:50'],
+        ['timePosteDayEnd', 'posteDayEnd', '18:00'],
+        ['timePosteNightStart', 'posteNightStart', '17:50'],
+        ['timePosteNightEnd', 'posteNightEnd', '06:00'],
+        ['timeSurfaceMorningStart', 'surfaceMorningStart', '06:50'],
+        ['timeSurfaceMorningEnd', 'surfaceMorningEnd', '11:45'],
+        ['timeSurfaceAfternoonStart', 'surfaceAfternoonStart', '12:50'],
+        ['timeSurfaceAfternoonEnd', 'surfaceAfternoonEnd', '18:50']
+      ];
+      timeFields.forEach(([elId, key, defVal]) => {
+        const el = document.getElementById(elId);
+        if (el) el.value = state[key] || defVal;
+      });
+
+      const isPoste = state.workMode === 'poste';
+      const headerPill = document.getElementById('headerWorkModePill');
+      const settingsPosteConfigBox = document.getElementById('settingsPosteConfigBox');
+
+      if (isPoste) {
+        headerPill.textContent = tr('نظام بوسط (Poste)', 'Système Poste', 'Poste Mode');
+        headerPill.className = 'px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-xs font-extrabold text-amber-300';
+        settingsPosteConfigBox.classList.remove('hidden');
+      } else {
+        headerPill.textContent = tr('نظام سورفاس (Surface)', 'Système Surface', 'Surface Mode');
+        headerPill.className = 'px-3 py-1.5 rounded-xl bg-sky-500/15 border border-sky-500/40 text-xs font-extrabold text-sky-300';
+        settingsPosteConfigBox.classList.add('hidden');
+      }
+
+      // Sync Poste Order Buttons in Settings
+      const btnNightFirst = document.getElementById('btnPosteNightFirst');
+      const btnDayFirst = document.getElementById('btnPosteDayFirst');
+      if (state.posteOrder !== 'day_first') {
+        btnNightFirst.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-indigo-500/25 text-indigo-300 border border-indigo-500/50 text-right';
+        btnDayFirst.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 border border-slate-800 hover:text-white text-right';
+      } else {
+        btnDayFirst.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-amber-500/25 text-amber-300 border border-amber-500/50 text-right';
+        btnNightFirst.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-slate-900 text-slate-400 border border-slate-800 hover:text-white text-right';
+      }
+
+      // Sync Common Rotation Preset Select in Settings
+      const presetSelect = document.getElementById('commonRotationPresetSelect');
+      if (presetSelect) {
+        const key = `${state.workDays},${state.homeDays}`;
+        const known = ['28,28', '21,21', '35,35', '42,21', '14,14'];
+        presetSelect.value = known.includes(key) ? key : '28,28';
+      }
+
+      // Render Hijri Settings Section
+      renderHijriSettingsSection();
+
+      renderDashboard();
+      renderHolidaysTab();
+      renderCalendarTab();
+    }
+
+    function renderHijriSettingsSection() {
+      const today = getSystemToday();
+      const hijriTodayStr = formatHijriDate(today, state.hijriOffset || 0);
+      const previewEl = document.getElementById('settingsHijriTodayPreview');
+      if (previewEl) {
+        previewEl.textContent = hijriTodayStr ? `${tr('التاريخ الهجري اليوم:', 'Date Hégirienne :', 'Hijri Date Today:')} ${hijriTodayStr}` : '';
+      }
+
+      const offsetVal = state.hijriOffset || 0;
+      const offsetSign = offsetVal > 0 ? `+${offsetVal}` : String(offsetVal);
+      const badgeEl = document.getElementById('settingsHijriOffsetBadge');
+      if (badgeEl) {
+        badgeEl.textContent = offsetVal === 0
+          ? tr('0 يوم (مطابق للحساب الفلكي)', '0 jour (Calcul astronomique)', '0 days (Astronomical calculation)')
+          : tr(`${offsetSign} يوم عن الحساب الفلكي`, `${offsetSign} j du calcul astronomique`, `${offsetSign} d from astronomical calc.`);
+      }
+
+      document.querySelectorAll('.settings-hijri-offset-btn').forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-hijri-set'), 10);
+        if (val === offsetVal) {
+          btn.className = 'settings-hijri-offset-btn py-2 rounded-xl text-xs font-extrabold border transition bg-amber-500 text-slate-950 border-amber-500 shadow';
+        } else {
+          btn.className = 'settings-hijri-offset-btn py-2 rounded-xl text-xs font-bold border transition bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700';
+        }
+      });
+
+    }
+
+    let shiftClockTimerId = null;
+
+    function updateShift12HourClock() {
+      const clockCircle = document.getElementById('shiftClockCircle');
+      const topLabel = document.getElementById('shiftClockTopLabel');
+      const centerTime = document.getElementById('shiftClockCenterTime');
+      const bottomLabel = document.getElementById('shiftClockBottomLabel');
+      if (!clockCircle || !topLabel || !centerTime || !bottomLabel) return;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const info = getStatusForDate(today);
+      const circumference = 314.16;
+      const TWELVE_HOURS_SEC = 12 * 3600;
+
+      const curSecondsOfDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+      function formatHMS(totalSec) {
+        const sec = Math.max(0, Math.floor(totalSec));
+        const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+        const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+        const s = String(sec % 60).padStart(2, '0');
+        return `${h}:${m}:${s}`;
+      }
+
+      if (!info.isWork) {
+        const secUntilMidnight = 24 * 3600 - curSecondsOfDay;
+        const pct = Math.min(1, Math.max(0, (curSecondsOfDay % TWELVE_HOURS_SEC) / TWELVE_HOURS_SEC));
+        clockCircle.setAttribute('stroke', '#10b981');
+        clockCircle.style.strokeDashoffset = String(circumference - pct * circumference);
+        topLabel.textContent = tr('متبقي للرجوع للعمل', 'Retour au travail', 'Return to work');
+        centerTime.textContent = `${info.daysRemaining} ${tr('يوم', 'j', 'd')}`;
+        bottomLabel.className = 'text-[10px] sm:text-[11px] font-bold text-emerald-400 leading-tight num-font';
+        bottomLabel.textContent = formatHMS(secUntilMidnight);
+        return;
+      }
+
+      let isCurrentlyInShift = false;
+      let remainingSec = 0;
+      let windowTotalSec = TWELVE_HOURS_SEC;
+      let targetTimeLabel = '';
+      let ringColor = '#38bdf8';
+      let bottomColorClass = 'text-sky-400';
+
+      const outWord = tr('الخروج', 'Sortie', 'Out');
+      const inWord = tr('الدخول', 'Entrée', 'In');
+
+      if (state.workMode === 'surface') {
+        const sMornInStr = state.surfaceMorningStart || '06:50';
+        const sMornOutStr = state.surfaceMorningEnd || '11:45';
+        const sAftInStr = state.surfaceAfternoonStart || '12:50';
+        const sAftOutStr = state.surfaceAfternoonEnd || '18:50';
+
+        const sMornIn = parseTimeSec(sMornInStr, '06:50');
+        const sMornOut = parseTimeSec(sMornOutStr, '11:45');
+        const sAftIn = parseTimeSec(sAftInStr, '12:50');
+        const sAftOut = parseTimeSec(sAftOutStr, '18:50');
+
+        if (curSecondsOfDay >= sMornIn && curSecondsOfDay < sMornOut) {
+          isCurrentlyInShift = true;
+          remainingSec = sMornOut - curSecondsOfDay;
+          windowTotalSec = Math.max(60, sMornOut - sMornIn);
+          targetTimeLabel = `${outWord} ${sMornOutStr}`;
+          ringColor = '#f59e0b';
+          bottomColorClass = 'text-amber-400';
+        } else if (curSecondsOfDay >= sMornOut && curSecondsOfDay < sAftIn) {
+          isCurrentlyInShift = false;
+          remainingSec = sAftIn - curSecondsOfDay;
+          windowTotalSec = Math.max(60, sAftIn - sMornOut);
+          targetTimeLabel = `${inWord} ${sAftInStr}`;
+          ringColor = '#10b981';
+          bottomColorClass = 'text-emerald-400';
+        } else if (curSecondsOfDay >= sAftIn && curSecondsOfDay < sAftOut) {
+          isCurrentlyInShift = true;
+          remainingSec = sAftOut - curSecondsOfDay;
+          windowTotalSec = Math.max(60, sAftOut - sAftIn);
+          targetTimeLabel = `${outWord} ${sAftOutStr}`;
+          ringColor = '#f59e0b';
+          bottomColorClass = 'text-amber-400';
+        } else {
+          isCurrentlyInShift = false;
+          windowTotalSec = Math.max(60, (24 * 3600 - sAftOut) + sMornIn);
+          if (curSecondsOfDay < sMornIn) {
+            remainingSec = sMornIn - curSecondsOfDay;
+          } else {
+            remainingSec = (24 * 3600 - curSecondsOfDay) + sMornIn;
+          }
+          targetTimeLabel = `${inWord} ${sMornInStr}`;
+          ringColor = '#10b981';
+          bottomColorClass = 'text-emerald-400';
+        }
+      } else {
+        const pDayInStr = state.posteDayStart || '05:50';
+        const pDayOutStr = state.posteDayEnd || '18:00';
+        const pNightInStr = state.posteNightStart || '17:50';
+        const pNightOutStr = state.posteNightEnd || '06:00';
+
+        const pDayIn = parseTimeSec(pDayInStr, '05:50');
+        const pDayOut = parseTimeSec(pDayOutStr, '18:00');
+        const pNightIn = parseTimeSec(pNightInStr, '17:50');
+        const pNightOut = parseTimeSec(pNightOutStr, '06:00');
+        const isNightShift = info.shiftType === 'poste_night';
+
+        if (!isNightShift) {
+          // Day Poste (typically pDayIn < pDayOut, e.g. 05:50 -> 18:00)
+          const inDayWindow = pDayIn <= pDayOut
+            ? (curSecondsOfDay >= pDayIn && curSecondsOfDay < pDayOut)
+            : (curSecondsOfDay >= pDayIn || curSecondsOfDay < pDayOut);
+
+          if (inDayWindow) {
+            isCurrentlyInShift = true;
+            windowTotalSec = pDayIn <= pDayOut ? Math.max(60, pDayOut - pDayIn) : Math.max(60, (24 * 3600 - pDayIn) + pDayOut);
+            remainingSec = curSecondsOfDay <= pDayOut ? (pDayOut - curSecondsOfDay) : ((24 * 3600 - curSecondsOfDay) + pDayOut);
+            targetTimeLabel = `${outWord} ${pDayOutStr}`;
+            ringColor = '#f59e0b';
+            bottomColorClass = 'text-amber-400';
+          } else {
+            isCurrentlyInShift = false;
+            windowTotalSec = Math.max(60, 24 * 3600 - (pDayIn <= pDayOut ? (pDayOut - pDayIn) : ((24 * 3600 - pDayIn) + pDayOut)));
+            remainingSec = curSecondsOfDay < pDayIn ? (pDayIn - curSecondsOfDay) : ((24 * 3600 - curSecondsOfDay) + pDayIn);
+            targetTimeLabel = `${inWord} ${pDayInStr}`;
+            ringColor = '#10b981';
+            bottomColorClass = 'text-emerald-400';
+          }
+        } else {
+          // Night Poste (typically pNightIn > pNightOut across midnight, e.g. 17:50 -> 06:00)
+          const inNightWindow = pNightIn > pNightOut
+            ? (curSecondsOfDay >= pNightIn || curSecondsOfDay < pNightOut)
+            : (curSecondsOfDay >= pNightIn && curSecondsOfDay < pNightOut);
+
+          if (inNightWindow) {
+            isCurrentlyInShift = true;
+            windowTotalSec = pNightIn > pNightOut ? Math.max(60, (24 * 3600 - pNightIn) + pNightOut) : Math.max(60, pNightOut - pNightIn);
+            remainingSec = curSecondsOfDay >= pNightIn && pNightIn > pNightOut
+              ? ((24 * 3600 - curSecondsOfDay) + pNightOut)
+              : (pNightOut - curSecondsOfDay);
+            targetTimeLabel = `${outWord} ${pNightOutStr}`;
+            ringColor = '#818cf8';
+            bottomColorClass = 'text-indigo-300';
+          } else {
+            isCurrentlyInShift = false;
+            windowTotalSec = Math.max(60, pNightIn > pNightOut ? (pNightIn - pNightOut) : (24 * 3600 - (pNightOut - pNightIn)));
+            remainingSec = curSecondsOfDay < pNightIn ? (pNightIn - curSecondsOfDay) : ((24 * 3600 - curSecondsOfDay) + pNightIn);
+            targetTimeLabel = `${inWord} ${pNightInStr}`;
+            ringColor = '#10b981';
+            bottomColorClass = 'text-emerald-400';
+          }
+        }
+      }
+
+      const elapsedSec = Math.max(0, windowTotalSec - remainingSec);
+      const progressRatio = Math.min(1, Math.max(0, elapsedSec / windowTotalSec));
+      const dashOffset = circumference - progressRatio * circumference;
+
+      clockCircle.setAttribute('stroke', ringColor);
+      clockCircle.style.strokeDashoffset = String(dashOffset);
+      topLabel.textContent = isCurrentlyInShift
+        ? tr('متبقي للخروج من العمل', 'Reste avant sortie', 'Left until shift end')
+        : tr('متبقي للرجوع للعمل', 'Reste avant reprise', 'Left until return');
+      centerTime.textContent = formatHMS(remainingSec);
+      bottomLabel.className = `text-[10px] sm:text-[11px] font-bold ${bottomColorClass} leading-tight num-font`;
+      bottomLabel.textContent = targetTimeLabel;
+    }
+
+    function renderDashboard() {
+      const today = getSystemToday();
+      const info = getStatusForDate(today);
+
+      const heroCard = document.getElementById('heroCard');
+      const statusBadge = document.getElementById('statusBadge');
+      const statusDot = document.getElementById('statusDot');
+      const statusBadgeText = document.getElementById('statusBadgeText');
+      const shiftTimingBadge = document.getElementById('shiftTimingBadge');
+      const mainHeadline = document.getElementById('mainHeadline');
+      const progressBarFill = document.getElementById('progressBarFill');
+      const gaugeCircle = document.getElementById('gaugeCircle');
+      const gaugeTopLabel = document.getElementById('gaugeTopLabel');
+      const gaugeCenterDays = document.getElementById('gaugeCenterDays');
+      const gaugeBottomLabel = document.getElementById('gaugeBottomLabel');
+
+      const hijriTodayStr = formatHijriDate(today, state.hijriOffset || 0);
+      const hijriPart = hijriTodayStr ? `(${hijriTodayStr})` : '';
+      const subHeadlineEl = document.getElementById('subHeadline');
+      if (subHeadlineEl) {
+        subHeadlineEl.innerHTML = tr(
+          `اليوم هو <span class="font-bold text-white" id="todayFormattedText">${formatArabicDate(today, true)}</span> <span class="inline-block text-sky-400 font-bold mx-1" id="todayHijriFormattedText">${hijriPart}</span> — اليوم رقم <span class="font-bold num-font" id="currentDayInPhase">${info.dayInPhase}</span> من أصل <span class="num-font" id="totalPhaseDays">${info.phaseTotal}</span> يوماً.`,
+          `Aujourd’hui : <span class="font-bold text-white" id="todayFormattedText">${formatArabicDate(today, true)}</span> <span class="inline-block text-sky-400 font-bold mx-1" id="todayHijriFormattedText">${hijriPart}</span> — Jour <span class="font-bold num-font" id="currentDayInPhase">${info.dayInPhase}</span> sur <span class="num-font" id="totalPhaseDays">${info.phaseTotal}</span>.`,
+          `Today is <span class="font-bold text-white" id="todayFormattedText">${formatArabicDate(today, true)}</span> <span class="inline-block text-sky-400 font-bold mx-1" id="todayHijriFormattedText">${hijriPart}</span> — Day <span class="font-bold num-font" id="currentDayInPhase">${info.dayInPhase}</span> of <span class="num-font" id="totalPhaseDays">${info.phaseTotal}</span>.`
+        );
+      }
+      document.getElementById('progressPercentLabel').textContent = `${info.progressPct}% ${tr('مكتمل', 'terminé', 'complete')}`;
+      progressBarFill.style.width = `${info.progressPct}%`;
+
+      const circumference = 314.16;
+      const offset = circumference - (info.progressPct / 100) * circumference;
+      gaugeCircle.style.strokeDashoffset = String(offset);
+      gaugeCenterDays.textContent = info.daysRemaining;
+
+      if (info.isWork) {
+        heroCard.className = 'relative overflow-hidden rounded-3xl p-6 border shadow-xl transition-all duration-300 bg-gradient-to-br from-amber-950/70 via-slate-900 to-slate-900 border-amber-500/40';
+        statusBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 pulse-ring';
+        statusBadgeText.textContent = tr('أنت الآن في فترة العمل 👷', 'Vous êtes en période de travail 👷', 'You are currently at work 👷');
+        mainHeadline.innerHTML = tr(`بقي لك <span class="text-amber-400 num-font">${info.daysRemaining}</span> يوماً للخروج إلى العطلة!`, `Il vous reste <span class="text-amber-400 num-font">${info.daysRemaining}</span> jours avant le congé !`, `<span class="text-amber-400 num-font">${info.daysRemaining}</span> days left until your leave!`);
+        progressBarFill.className = 'h-full rounded-full bg-gradient-to-l from-amber-400 to-orange-500 transition-all duration-500';
+        gaugeCircle.setAttribute('stroke', '#f59e0b');
+        gaugeTopLabel.textContent = tr('متبقي للخروج', 'Reste avant congé', 'Left until leave');
+        gaugeBottomLabel.className = 'text-xs font-bold text-amber-400'; gaugeBottomLabel.textContent = tr('يوم', 'jours', 'days');
+        document.getElementById('cardTransitionTitle').textContent = tr('تاريخ الخروج للعطلة 🏠', 'Date de sortie (Congé) 🏠', 'Leave Start Date 🏠');
+        document.getElementById('cardTransitionDate').className = 'text-sm font-bold text-emerald-400 num-font mt-1 block';
+        document.getElementById('cardNextReturnTitle').textContent = tr('العودة للعمل بعدها 👷', 'Reprise suivante 👷', 'Next Return Date 👷');
+        document.getElementById('cardNextReturnDate').className = 'text-sm font-bold text-amber-400 num-font mt-1 block';
+
+        if (state.workMode === 'surface') {
+          shiftTimingBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-sky-500/20 text-sky-300 border border-sky-500/30';
+          shiftTimingBadge.innerHTML = `<span>☀️ ${info.shiftLabel}: ${info.shiftHoursText}</span>`;
+        } else {
+          const isNight = info.shiftType === 'poste_night';
+          shiftTimingBadge.className = isNight
+            ? 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/25 text-indigo-300 border border-indigo-500/40'
+            : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-amber-500/25 text-amber-300 border border-amber-500/40';
+          shiftTimingBadge.innerHTML = `<span>${info.shiftLabel} • ${info.shiftHoursText}</span>`;
+        }
+      } else {
+        heroCard.className = 'relative overflow-hidden rounded-3xl p-6 border shadow-xl transition-all duration-300 bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-900 border-emerald-500/40';
+        statusBadge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-ring';
+        statusBadgeText.textContent = tr('أنت الآن في إجازة (في البيت) 🏠', 'Vous êtes en congé (à la maison) 🏠', 'You are currently on leave (Home) 🏠');
+        shiftTimingBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+        shiftTimingBadge.innerHTML = `<span>🏠 ${tr('فترة الإجازة والراحة في البيت', 'Période de congé et repos à la maison', 'Leave & rest period at home')}</span>`;
+        mainHeadline.innerHTML = tr(`باقي لك <span class="text-emerald-400 num-font">${info.daysRemaining}</span> يوماً لكي تنتهي إجازتك وتدخل للعمل!`, `Il vous reste <span class="text-emerald-400 num-font">${info.daysRemaining}</span> jours avant la fin de votre congé !`, `<span class="text-emerald-400 num-font">${info.daysRemaining}</span> days left until your leave ends!`);
+        progressBarFill.className = 'h-full rounded-full bg-gradient-to-l from-emerald-400 to-teal-500 transition-all duration-500';
+        gaugeCircle.setAttribute('stroke', '#10b981');
+        gaugeTopLabel.textContent = tr('متبقي لانتهاء الإجازة', 'Fin du congé dans', 'Leave ends in');
+        gaugeBottomLabel.className = 'text-xs font-bold text-emerald-400'; gaugeBottomLabel.textContent = tr('يوم', 'jours', 'days');
+        document.getElementById('cardTransitionTitle').textContent = tr('تاريخ الدخول للعمل 👷', 'Date de reprise 👷', 'Return to Work Date 👷');
+        document.getElementById('cardTransitionDate').className = 'text-sm font-bold text-amber-400 num-font mt-1 block';
+        document.getElementById('cardNextReturnTitle').textContent = tr('الخروج للعطلة التالية 🏠', 'Congé suivant 🏠', 'Next Leave Date 🏠');
+        document.getElementById('cardNextReturnDate').className = 'text-sm font-bold text-emerald-400 num-font mt-1 block';
+      }
+
+      document.getElementById('cardPhaseStart').textContent = formatArabicDate(info.phaseStartDate, false);
+      document.getElementById('cardTransitionDate').textContent = formatArabicDate(info.switchDate, true);
+      document.getElementById('cardNextReturnDate').textContent = formatArabicDate(info.nextSwitchAfterThat, false);
+
+      const allHolidays = getAllHolidaysEvaluated().filter(h => h.daysFromToday >= -2);
+      const homeHolidaysCount = allHolidays.filter(h => h.statusType === 'home' || h.statusType === 'mixed').length;
+      document.getElementById('cardHolidaysAtHomeRatio').textContent = tr(`${homeHolidaysCount} من ${allHolidays.length} في البيت`, `${homeHolidaysCount} sur ${allHolidays.length} à la maison`, `${homeHolidaysCount} of ${allHolidays.length} at home`);
+
+      // Sync Collapsible Upcoming Holidays Popup Drawer on Dashboard
+      const upcomingDrawerBox = document.getElementById('upcomingHolidaysDrawerBox');
+      const upcomingDrawerLabel = document.getElementById('upcomingHolidaysDrawerLabel');
+      const upcomingDrawerArrow = document.getElementById('upcomingHolidaysDrawerArrow');
+      const upcomingSummaryHint = document.getElementById('upcomingHolidaysSummaryHint');
+      if (upcomingDrawerBox) {
+        const isUpOpen = Boolean(state.openUpcomingHolidaysDrawer);
+        upcomingDrawerBox.classList.toggle('hidden', !isUpOpen);
+        upcomingDrawerLabel.textContent = isUpOpen ? tr('إغلاق النافذة', 'Fermer', 'Close') : tr('فتح النافذة', 'Ouvrir', 'Open');
+        upcomingDrawerArrow.textContent = isUpOpen ? '▲' : '▼';
+        if (allHolidays.length > 0 && upcomingSummaryHint) {
+          const nextHol = allHolidays[0];
+          const nextWhere = nextHol.statusType === 'home'
+            ? tr('في البيت 🏠', 'Maison 🏠', 'At Home 🏠')
+            : (nextHol.statusType === 'work' ? tr('في العمل 👷', 'Travail 👷', 'At Work 👷') : tr('مشترك 🔄', 'Mixte 🔄', 'Mixed 🔄'));
+          upcomingSummaryHint.textContent = tr(
+            `أقرب مناسبة: ${getHolName(nextHol)} (${nextWhere}) — اضغط لفتح القائمة`,
+            `Prochaine fête : ${getHolName(nextHol)} (${nextWhere}) — Cliquez pour ouvrir`,
+            `Next holiday: ${getHolName(nextHol)} (${nextWhere}) — Click to open`
+          );
+        }
+      }
+
+      const previewContainer = document.getElementById('upcomingHolidaysPreview');
+      const top6 = allHolidays.slice(0, 6);
+      previewContainer.innerHTML = top6.map(h => {
+        const badgeHtml = getHolidayBadgeHtml(h);
+        const countdownTxt = h.daysFromToday === 0
+          ? tr('اليوم!', 'Aujourd’hui !', 'Today!')
+          : (h.daysFromToday > 0
+              ? tr(`بعد ${h.daysFromToday} يوم`, `Dans ${h.daysFromToday} j`, `In ${h.daysFromToday} d`)
+              : tr(`منذ ${Math.abs(h.daysFromToday)} يوم`, `Il y a ${Math.abs(h.daysFromToday)} j`, `${Math.abs(h.daysFromToday)} d ago`));
+        const firstDayShift = h.dayBreakdown[0];
+        const shiftSubNote = firstDayShift.isWork ? `• ${firstDayShift.shiftLabel}` : '';
+        return `
+          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-extrabold text-white">${getHolName(h)}</span>
+              </div>
+              <p class="text-xs text-slate-400 num-font">${formatArabicDate(h.effectiveStartDate, true)}</p>
+              <span class="inline-block text-[11px] text-sky-400 num-font">${getHolNote(h)} • ${countdownTxt} ${shiftSubNote}</span>
+            </div>
+            <div class="shrink-0 text-left">
+              ${badgeHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Dedicated Ramadan Fasting Breakdown Box
+      updateShift12HourClock();
+      renderRamadanFastingBox();
+      renderEidAdhaBox();
+
+      // Sync collapsible Cycles Drawer state
+      const cyclesDrawerBox = document.getElementById('rotationCyclesDrawerBox');
+      const cyclesDrawerLabel = document.getElementById('cyclesDrawerLabel');
+      const cyclesDrawerArrow = document.getElementById('cyclesDrawerArrow');
+      if (cyclesDrawerBox) {
+        const isOpen = Boolean(state.openCyclesDrawer);
+        cyclesDrawerBox.classList.toggle('hidden', !isOpen);
+        cyclesDrawerLabel.textContent = isOpen ? tr('إغلاق الجدول', 'Fermer', 'Close') : tr('فتح الجدول', 'Ouvrir', 'Open');
+        cyclesDrawerArrow.textContent = isOpen ? '▲' : '▼';
+      }
+
+      // Render 8 upcoming rotation cycles table
+      const tbody = document.getElementById('rotationCyclesTableBody');
+      const rows = [];
+      let cursorDate = info.phaseStartDate;
+      let cursorIsWork = info.isWork;
+
+      for (let i = 0; i < 8; i++) {
+        const len = cursorIsWork ? Number(state.workDays) : Number(state.homeDays);
+        const endDate = addDays(cursorDate, len - 1);
+
+        let badge = '';
+        if (cursorIsWork) {
+          if (state.workMode === 'surface') {
+            const sTimes = `${state.surfaceMorningStart || '06:50'}-${state.surfaceMorningEnd || '11:45'} | ${state.surfaceAfternoonStart || '12:50'}-${state.surfaceAfternoonEnd || '18:50'}`;
+            badge = `<div class="space-y-1"><span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-bold inline-block">${tr('عمل سورفاس ☀️', 'Travail Surface ☀️', 'Surface Work ☀️')} (${sTimes})</span></div>`;
+          } else {
+            const cycleSegs = getNormalizedPosteSegments(len, cursorDate);
+            const segDesc = cycleSegs.map(s => s.shortTitle).join(' + ');
+            const changeDates = cycleSegs.slice(1).map(s => formatArabicDate(s.segStartDate, false)).join(' ، ');
+            badge = `
+              <div class="space-y-1">
+                <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold inline-block">${tr('بوسط 🔄', 'Poste 🔄', 'Poste 🔄')} (${segDesc})</span>
+                ${changeDates ? `<span class="block text-[11px] text-indigo-300">${tr('تبديل البوسط (24 سا):', 'Changement (24h) :', 'Changeover (24h):')} ${changeDates}</span>` : ''}
+              </div>
+            `;
+          }
+        } else {
+          badge = `<span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold inline-block">${tr('عطلة بالبيت 🏠', 'Congé Maison 🏠', 'Home Leave 🏠')}</span>`;
+        }
+
+        const rowHighlight = i === 0 ? 'bg-slate-800/40 font-bold' : '';
+        rows.push(`
+          <tr class="${rowHighlight}">
+            <td class="py-3 text-xs text-slate-300">${i === 0 ? tr('الفترة الحالية', 'Cycle actuel', 'Current Cycle') : `${tr('الفترة', 'Cycle', 'Cycle')} +${i}`}</td>
+            <td class="py-3">${badge}</td>
+            <td class="py-3 text-xs text-white">${formatArabicDate(cursorDate, true)}</td>
+            <td class="py-3 text-xs text-slate-300">${formatArabicDate(endDate, true)}</td>
+            <td class="py-3 text-xs text-slate-400">${len} ${tr('يوم', 'jours', 'days')}</td>
+          </tr>
+        `);
+        cursorDate = addDays(endDate, 1);
+        cursorIsWork = !cursorIsWork;
+      }
+      tbody.innerHTML = rows.join('');
+    }
+
+    function renderRamadanFastingBox() {
+      const ramadanId = state.ramadanSelectedId || 'ramadan-2027';
+      const totalDays = parseInt(state.ramadanDaysCount, 10) === 29 ? 29 : 30;
+
+      const yearSelect = document.getElementById('ramadanYearSelect');
+      const daysSelect = document.getElementById('ramadanDaysCountSelect');
+      if (yearSelect) yearSelect.value = ramadanId;
+      if (daysSelect) daysSelect.value = String(totalDays);
+
+      // Sync Drawer Open/Close state
+      const drawerBox = document.getElementById('ramadanDrawerBox');
+      const drawerLabel = document.getElementById('ramadanDrawerLabel');
+      const drawerArrow = document.getElementById('ramadanDrawerArrow');
+      if (drawerBox) {
+        const isOpen = Boolean(state.openRamadanDrawer);
+        drawerBox.classList.toggle('hidden', !isOpen);
+        drawerLabel.textContent = isOpen ? tr('إغلاق', 'Fermer', 'Close') : tr('التفاصيل', 'Détails', 'Details');
+        drawerArrow.textContent = isOpen ? '▲' : '▼';
+      }
+
+      const baseObj = BASE_HOLIDAYS.find(h => h.id === ramadanId) || BASE_HOLIDAYS.find(h => h.id === 'ramadan-2027');
+      const evalHol = evaluateHoliday(baseObj);
+      const startDate = evalHol.effectiveStartDate;
+      const endDate = addDays(startDate, totalDays - 1);
+      const eidDate = addDays(startDate, totalDays);
+      const eidStatus = getStatusForDate(eidDate);
+
+      let homeDays = 0;
+      let workDaysCount = 0;
+      let workNightDays = 0;
+      let workDayDays = 0;
+
+      const periods = [];
+
+      for (let i = 0; i < totalDays; i++) {
+        const d = addDays(startDate, i);
+        const st = getStatusForDate(d);
+        const rDay = i + 1;
+
+        if (st.isWork) {
+          workDaysCount++;
+          if (st.shiftType === 'poste_night') workNightDays++;
+          else workDayDays++;
+        } else {
+          homeDays++;
+        }
+
+        // Group contiguous periods by state (Home vs Work + shiftType)
+        const key = st.isWork ? `work_${st.shiftType}` : 'home';
+        const last = periods[periods.length - 1];
+        if (!last || last.key !== key) {
+          periods.push({
+            key,
+            isWork: st.isWork,
+            shiftType: st.shiftType,
+            startRDay: rDay,
+            endRDay: rDay,
+            startDate: d,
+            endDate: d,
+            daysCount: 1
+          });
+        } else {
+          last.endRDay = rDay;
+          last.endDate = d;
+          last.daysCount++;
+        }
+      }
+
+      // Header collapsed quick summary
+      const quickHeaderEl = document.getElementById('ramadanQuickHeaderSummary');
+      if (quickHeaderEl) {
+        quickHeaderEl.textContent = tr(`🏠 ${homeDays} يوم في البيت • 👷 ${workDaysCount} يوم في العمل`, `🏠 ${homeDays} j Maison • 👷 ${workDaysCount} j Travail`, `🏠 ${homeDays} d Home • 👷 ${workDaysCount} d Work`);
+      }
+
+      // Concise start/end line inside drawer
+      const summaryEl = document.getElementById('ramadanStartEndSummaryText');
+      if (summaryEl) {
+        summaryEl.innerHTML = tr(
+          `📅 من <strong class="text-white">${formatArabicDate(startDate, false)}</strong> إلى <strong class="text-white">${formatArabicDate(endDate, false)}</strong>`,
+          `📅 Du <strong class="text-white">${formatArabicDate(startDate, false)}</strong> au <strong class="text-white">${formatArabicDate(endDate, false)}</strong>`,
+          `📅 From <strong class="text-white">${formatArabicDate(startDate, false)}</strong> to <strong class="text-white">${formatArabicDate(endDate, false)}</strong>`
+        );
+      }
+
+      document.getElementById('ramadanHomeDaysBig').textContent = homeDays;
+      document.getElementById('ramadanHomeDaysSub').textContent = tr('يوم', 'jours', 'days');
+      document.getElementById('ramadanWorkDaysBig').textContent = workDaysCount;
+
+      const workSubEl = document.getElementById('ramadanWorkShiftBreakdownSub');
+      if (workDaysCount === 0) {
+        workSubEl.textContent = tr('يوم', 'jours', 'days');
+      } else if (state.workMode === 'surface') {
+        workSubEl.textContent = tr('سورفاس نهاري ☀️', 'Surface Jour ☀️', 'Surface Day ☀️');
+      } else {
+        const parts = [];
+        if (workNightDays > 0) parts.push(tr(`${workNightDays} ليل 🌙`, `${workNightDays} Nuit 🌙`, `${workNightDays} Night 🌙`));
+        if (workDayDays > 0) parts.push(tr(`${workDayDays} نهار ☀️`, `${workDayDays} Jour ☀️`, `${workDayDays} Day ☀️`));
+        workSubEl.textContent = parts.join(' • ');
+      }
+
+      // Render ultra-clean rows for each period
+      const periodsContainer = document.getElementById('ramadanPeriodsBreakdownList');
+      const rowsHtml = periods.map(p => {
+        let statusTag = '';
+        let badgeColor = '';
+        if (!p.isWork) {
+          statusTag = `<span class="font-extrabold text-emerald-400">${tr('🏠 في البيت', '🏠 Maison', '🏠 At Home')}</span>`;
+          badgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+        } else if (state.workMode === 'surface') {
+          statusTag = `<span class="font-extrabold text-sky-400">${tr('☀️ عمل (سورفاس)', '☀️ Travail (Surface)', '☀️ Work (Surface)')}</span>`;
+          badgeColor = 'bg-sky-500/20 text-sky-300 border-sky-500/30';
+        } else if (p.shiftType === 'poste_night') {
+          statusTag = `<span class="font-extrabold text-indigo-300">${tr('🌙 عمل (ليل)', '🌙 Travail (Nuit)', '🌙 Work (Night)')}</span>`;
+          badgeColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+        } else {
+          statusTag = `<span class="font-extrabold text-amber-400">${tr('☀️ عمل (نهار)', '☀️ Travail (Jour)', '☀️ Work (Day)')}</span>`;
+          badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+        }
+
+        const rWord = tr('رمضان', 'Ramadan', 'Ramadan');
+        const rRange = p.startRDay === p.endRDay ? `${p.startRDay} ${rWord}` : `${p.startRDay} - ${p.endRDay} ${rWord}`;
+        const dateRange = `${formatArabicDate(p.startDate, false)} ← ${formatArabicDate(p.endDate, false)}`;
+
+        return `
+          <div class="grid grid-cols-3 items-center px-3.5 py-2.5 text-xs gap-2">
+            <div>
+              ${statusTag}
+              <span class="block text-[11px] text-slate-400 mt-0.5">${rRange}</span>
+            </div>
+            <div class="text-slate-200 text-[11px] sm:text-xs font-semibold">
+              ${dateRange}
+            </div>
+            <div class="text-left">
+              <span class="inline-block px-2.5 py-1 rounded-xl border text-xs font-extrabold ${badgeColor}">
+                ${p.daysCount} ${tr('يوم', 'j', 'd')}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const eidBadge = eidStatus.isWork
+        ? `<span class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 font-extrabold">${tr('في العمل 👷', 'Au travail 👷', 'At Work 👷')}</span>`
+        : `<span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-extrabold">${tr('في البيت 🏠', 'À la maison 🏠', 'At Home 🏠')}</span>`;
+
+      periodsContainer.innerHTML = rowsHtml + `
+        <div class="grid grid-cols-3 items-center px-3.5 py-2.5 text-xs bg-slate-900/60 gap-2">
+          <div class="font-extrabold text-white">${tr('🎉 عيد الفطر', '🎉 Aïd el-Fitr', '🎉 Eid al-Fitr')}</div>
+          <div class="text-slate-300 text-[11px] sm:text-xs font-semibold">${formatArabicDate(eidDate, false)}</div>
+          <div class="text-left">${eidBadge}</div>
+        </div>
+      `;
+    }
+
+    function renderEidAdhaBox() {
+      const yr = state.adhaSelectedYear || '2027';
+      const adhaSelect = document.getElementById('adhaYearSelect');
+      if (adhaSelect) adhaSelect.value = yr;
+
+      const drawerBox = document.getElementById('adhaDrawerBox');
+      const drawerArrow = document.getElementById('adhaDrawerArrow');
+      if (drawerBox && drawerArrow) {
+        const isOpen = Boolean(state.openAdhaDrawer);
+        drawerBox.classList.toggle('hidden', !isOpen);
+        drawerArrow.textContent = isOpen ? '▲' : '▼';
+      }
+
+      const arafahBase = BASE_HOLIDAYS.find(h => h.id === `arafah-${yr}`) || BASE_HOLIDAYS.find(h => h.id === 'arafah-2027');
+      const adhaBase = BASE_HOLIDAYS.find(h => h.id === `adha-${yr}`) || BASE_HOLIDAYS.find(h => h.id === 'adha-2027');
+
+      const arafahEval = evaluateHoliday(arafahBase);
+      const adhaEval = evaluateHoliday(adhaBase);
+
+      const mainBadge = document.getElementById('adhaMainStatusBadge');
+      const subtitleEl = document.getElementById('adhaQuickDateSubtitle');
+      const rangeSummaryEl = document.getElementById('adhaDateRangeSummary');
+
+      if (subtitleEl) {
+        subtitleEl.textContent = `📅 ${formatArabicDate(adhaEval.effectiveStartDate, true)}`;
+      }
+      if (rangeSummaryEl) {
+        rangeSummaryEl.innerHTML = tr(
+          `📅 من <strong class="text-white">${formatArabicDate(arafahEval.effectiveStartDate, false)}</strong> (وقفة عرفة) إلى <strong class="text-white">${formatArabicDate(adhaEval.effectiveEndDate, false)}</strong>`,
+          `📅 Du <strong class="text-white">${formatArabicDate(arafahEval.effectiveStartDate, false)}</strong> (Arafat) au <strong class="text-white">${formatArabicDate(adhaEval.effectiveEndDate, false)}</strong>`,
+          `📅 From <strong class="text-white">${formatArabicDate(arafahEval.effectiveStartDate, false)}</strong> (Arafah) to <strong class="text-white">${formatArabicDate(adhaEval.effectiveEndDate, false)}</strong>`
+        );
+      }
+
+      if (mainBadge) {
+        if (adhaEval.statusType === 'home') {
+          mainBadge.className = 'px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold';
+          mainBadge.textContent = tr('في البيت 🏠', 'À la maison 🏠', 'At Home 🏠');
+        } else if (adhaEval.statusType === 'work') {
+          const firstShift = adhaEval.dayBreakdown[0];
+          const shiftShort = state.workMode === 'surface'
+            ? tr('سورفاس ☀️', 'Surface ☀️', 'Surface ☀️')
+            : (firstShift.shiftType === 'poste_night' ? tr('ليل 🌙', 'Nuit 🌙', 'Night 🌙') : tr('نهار ☀️', 'Jour ☀️', 'Day ☀️'));
+          mainBadge.className = 'px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-extrabold';
+          mainBadge.textContent = `${tr('في العمل', 'Au travail', 'At Work')} (${shiftShort}) 👷`;
+        } else {
+          mainBadge.className = 'px-3 py-1.5 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-extrabold';
+          mainBadge.textContent = tr(
+            `مشترك (${adhaEval.homeCount} بيت / ${adhaEval.workCount} عمل) 🔄`,
+            `Mixte (${adhaEval.homeCount} maison / ${adhaEval.workCount} travail) 🔄`,
+            `Mixed (${adhaEval.homeCount} home / ${adhaEval.workCount} work) 🔄`
+          );
+        }
+      }
+
+      const daysItems = [
+        { label: tr('وقفة عرفة (9 ذو الحجة)', 'Jour d’Arafat (9 Dhou al-Hijja)', 'Day of Arafah (9 Dhu al-Hijjah)'), date: arafahEval.effectiveStartDate, st: arafahEval.dayBreakdown[0] },
+        ...adhaEval.dayBreakdown.map((db, idx) => ({
+          label: tr(`اليوم ${idx + 1} من العيد (${10 + idx} ذو الحجة)`, `Jour ${idx + 1} de l’Aïd (${10 + idx} Dhou al-Hijja)`, `Day ${idx + 1} of Eid (${10 + idx} Dhu al-Hijjah)`),
+          date: db.date,
+          st: db
+        }))
+      ];
+
+      const listEl = document.getElementById('adhaDaysBreakdownList');
+      if (listEl) {
+        listEl.innerHTML = daysItems.map(item => {
+          let badgeHtml = '';
+          if (!item.st.isWork) {
+            badgeHtml = `<span class="inline-block px-2.5 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-extrabold">${tr('في البيت 🏠', 'À la maison 🏠', 'At Home 🏠')}</span>`;
+          } else if (state.workMode === 'surface') {
+            badgeHtml = `<span class="inline-block px-2.5 py-1 rounded-xl bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-extrabold">${tr('في العمل (سورفاس ☀️)', 'Au travail (Surface ☀️)', 'At Work (Surface ☀️)')}</span>`;
+          } else if (item.st.shiftType === 'poste_night') {
+            badgeHtml = `<span class="inline-block px-2.5 py-1 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-extrabold">${tr('في العمل (ليل 🌙)', 'Au travail (Nuit 🌙)', 'At Work (Night 🌙)')}</span>`;
+          } else {
+            badgeHtml = `<span class="inline-block px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-extrabold">${tr('في العمل (نهار ☀️)', 'Au travail (Jour ☀️)', 'At Work (Day ☀️)')}</span>`;
+          }
+
+          return `
+            <div class="grid grid-cols-3 items-center px-3.5 py-2.5 text-xs gap-2">
+              <div class="font-bold text-white">${item.label}</div>
+              <div class="text-slate-300 text-[11px] sm:text-xs font-semibold">${formatArabicDate(item.date, true)}</div>
+              <div class="text-left">${badgeHtml}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function getHolidayBadgeHtml(h) {
+      if (h.statusType === 'home') {
+        return `<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-extrabold">${tr('🏠 في البيت (عطلة)', '🏠 À la maison (Congé)', '🏠 At Home (Leave)')}</span>`;
+      }
+      if (h.statusType === 'work') {
+        const firstShift = h.dayBreakdown[0];
+        const icon = firstShift.shiftType === 'poste_night' ? '🌙' : '☀️';
+        return `<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-extrabold">${icon} ${tr('في العمل', 'Au travail', 'At Work')}</span>`;
+      }
+      return `<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 text-xs font-extrabold">🔄 ${tr(`مشترك (${h.homeCount} بيت / ${h.workCount} عمل)`, `Mixte (${h.homeCount} maison / ${h.workCount} travail)`, `Mixed (${h.homeCount} home / ${h.workCount} work)`)}</span>`;
+    }
+
+    function renderHolidaysTab() {
+      const all = getAllHolidaysEvaluated().filter(h => h.daysFromToday >= -5);
+      const filtered = all.filter(h => {
+        if (state.holidayFilter === 'religious') return h.category === 'religious';
+        if (state.holidayFilter === 'national') return h.category === 'national';
+        if (state.holidayFilter === 'home') return h.statusType === 'home' || h.statusType === 'mixed';
+        if (state.holidayFilter === 'work') return h.statusType === 'work' || h.statusType === 'mixed';
+        return true;
+      });
+
+      const homeHolidaysList = filtered.filter(h => h.statusType === 'home' || h.statusType === 'mixed');
+      const workHolidaysList = filtered.filter(h => h.statusType === 'work' || h.statusType === 'mixed');
+
+      document.getElementById('statHolidaysHome').textContent = homeHolidaysList.length;
+      document.getElementById('statHolidaysWork').textContent = workHolidaysList.length;
+
+      // Render expandable drawers for Home & Work cards
+      const homeDrawerBox = document.getElementById('homeHolidaysDrawerBox');
+      const workDrawerBox = document.getElementById('workHolidaysDrawerBox');
+      const homeDrawerArrow = document.getElementById('homeDrawerArrow');
+      const workDrawerArrow = document.getElementById('workDrawerArrow');
+      const btnHomeCard = document.getElementById('btnToggleHomeHolidaysDrawer');
+      const btnWorkCard = document.getElementById('btnToggleWorkHolidaysDrawer');
+
+      const isHomeOpen = state.openHolidayDrawer === 'home';
+      const isWorkOpen = state.openHolidayDrawer === 'work';
+
+      homeDrawerBox.classList.toggle('hidden', !isHomeOpen);
+      workDrawerBox.classList.toggle('hidden', !isWorkOpen);
+      homeDrawerArrow.textContent = isHomeOpen ? '▲' : '▼';
+      workDrawerArrow.textContent = isWorkOpen ? '▲' : '▼';
+
+      btnHomeCard.className = isHomeOpen
+        ? 'bg-emerald-900/50 border-2 border-emerald-400 rounded-2xl p-4 text-center transition flex flex-col items-center justify-between shadow-lg'
+        : 'bg-emerald-950/40 hover:bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-4 text-center transition flex flex-col items-center justify-between shadow-md';
+
+      btnWorkCard.className = isWorkOpen
+        ? 'bg-amber-900/50 border-2 border-amber-400 rounded-2xl p-4 text-center transition flex flex-col items-center justify-between shadow-lg'
+        : 'bg-amber-950/40 hover:bg-amber-950/60 border border-amber-500/40 rounded-2xl p-4 text-center transition flex flex-col items-center justify-between shadow-md';
+
+      // Populate Home Holidays Drawer List
+      const homeDrawerListEl = document.getElementById('homeHolidaysDrawerList');
+      if (homeHolidaysList.length === 0) {
+        homeDrawerListEl.innerHTML = `<div class="col-span-2 text-xs text-slate-400 text-center py-3">${tr('لا توجد مناسبات في البيت ضمن هذا الفلتر.', 'Aucune fête à la maison pour ce filtre.', 'No holidays at home for this filter.')}</div>`;
+      } else {
+        homeDrawerListEl.innerHTML = homeHolidaysList.map(h => `
+          <div class="bg-slate-950/90 border border-emerald-500/30 rounded-xl p-3 flex items-center justify-between gap-2">
+            <div>
+              <span class="text-xs font-extrabold text-white block">${getHolName(h)}</span>
+              <span class="text-[11px] text-emerald-300 num-font block mt-0.5">📅 ${formatArabicDate(h.effectiveStartDate, true)}</span>
+              <span class="text-[10px] text-slate-400 num-font block">${getHolNote(h)}</span>
+            </div>
+            <span class="text-[10px] px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold shrink-0">
+              ${h.statusType === 'mixed' ? tr(`مشترك (${h.homeCount} بيت)`, `Mixte (${h.homeCount} maison)`, `Mixed (${h.homeCount} home)`) : tr('في البيت 🏠', 'Maison 🏠', 'At Home 🏠')}
+            </span>
+          </div>
+        `).join('');
+      }
+
+      // Populate Work Holidays Drawer List
+      const workDrawerListEl = document.getElementById('workHolidaysDrawerList');
+      if (workHolidaysList.length === 0) {
+        workDrawerListEl.innerHTML = `<div class="col-span-2 text-xs text-slate-400 text-center py-3">${tr('لا توجد مناسبات في العمل ضمن هذا الفلتر.', 'Aucune fête au travail pour ce filtre.', 'No holidays at work for this filter.')}</div>`;
+      } else {
+        workDrawerListEl.innerHTML = workHolidaysList.map(h => {
+          const firstDayShift = h.dayBreakdown.find(d => d.isWork) || h.dayBreakdown[0];
+          return `
+            <div class="bg-slate-950/90 border border-amber-500/30 rounded-xl p-3 flex items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-extrabold text-white block">${getHolName(h)}</span>
+                <span class="text-[11px] text-amber-300 num-font block mt-0.5">📅 ${formatArabicDate(h.effectiveStartDate, true)}</span>
+                <span class="text-[10px] text-slate-400 num-font block">${getHolNote(h)} • ${firstDayShift.shiftLabel}</span>
+              </div>
+              <span class="text-[10px] px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold shrink-0">
+                ${h.statusType === 'mixed' ? tr(`مشترك (${h.workCount} عمل)`, `Mixte (${h.workCount} travail)`, `Mixed (${h.workCount} work)`) : tr('في العمل 👷', 'Travail 👷', 'At Work 👷')}
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const listEl = document.getElementById('holidaysFullList');
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-sm text-slate-400">${tr('لا توجد مناسبات مطابقة لهذا الفلتر.', 'Aucun événement correspondant.', 'No matching events found.')}</div>`;
+        return;
+      }
+
+      const l = state.lang || 'ar';
+      const daysArr = DAYS_BY_LANG[l] || DAYS_BY_LANG.ar;
+
+      listEl.innerHTML = filtered.map(h => {
+        const badgeHtml = getHolidayBadgeHtml(h);
+        const isCustom = String(h.id).startsWith('custom-');
+        const countdownBadge = h.daysFromToday === 0
+          ? `<span class="text-xs font-bold text-emerald-400">${tr('اليوم!', 'Aujourd’hui !', 'Today!')}</span>`
+          : (h.daysFromToday > 0
+              ? `<span class="text-xs text-slate-400 num-font">${tr(`يتبقى ${h.daysFromToday} يوم`, `Dans ${h.daysFromToday} jours`, `In ${h.daysFromToday} days`)}</span>`
+              : `<span class="text-xs text-slate-500 num-font">${tr('مضى', 'Passé', 'Passed')}</span>`);
+
+        let breakdownHtml = '';
+        if (h.duration > 1) {
+          const pills = h.dayBreakdown.map((db, idx) => {
+            const pillColor = db.isWork
+              ? (db.shiftType === 'poste_night'
+                  ? 'bg-indigo-950/80 border-indigo-500/40 text-indigo-300'
+                  : 'bg-amber-950/80 border-amber-500/40 text-amber-300')
+              : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300';
+            const statusWord = db.isWork ? db.shiftLabel : tr('بيت 🏠', 'Maison 🏠', 'Home 🏠');
+            return `<span class="px-2.5 py-1 rounded-lg border text-[11px] num-font ${pillColor}">${tr('اليوم', 'Jour', 'Day')} ${idx + 1} (${daysArr[db.date.getDay()]}): ${statusWord}</span>`;
+          }).join('');
+          breakdownHtml = `<div class="mt-3 pt-2.5 border-t border-slate-800/80 flex flex-wrap gap-1.5">${pills}</div>`;
+        } else {
+          const st = h.dayBreakdown[0];
+          const detailText = st.isWork
+            ? tr(`يصادف اليوم رقم ${st.dayInPhase} من عملك • ${st.shiftLabel} (${st.shiftHoursText})`, `Jour ${st.dayInPhase} de travail • ${st.shiftLabel} (${st.shiftHoursText})`, `Work day #${st.dayInPhase} • ${st.shiftLabel} (${st.shiftHoursText})`)
+            : tr(`يصادف اليوم رقم ${st.dayInPhase} من عطلتك في البيت`, `Jour ${st.dayInPhase} de votre congé à la maison`, `Day #${st.dayInPhase} of your home leave`);
+          breakdownHtml = `<div class="mt-2 text-[11px] text-slate-400 num-font">${detailText}</div>`;
+        }
+
+        const deleteBtnHtml = isCustom
+          ? `<button type="button" data-delete-custom="${h.id}" class="text-xs text-rose-400 hover:text-rose-300 px-2 py-1 rounded bg-rose-950/40">${tr('حذف', 'Supprimer', 'Delete')}</button>`
+          : '';
+
+        return `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md transition hover:border-slate-700">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-base font-extrabold text-white">${getHolName(h)}</span>
+                  <span class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-sky-300 num-font">${getHolNote(h)}</span>
+                  ${countdownBadge}
+                </div>
+                <p class="text-xs text-slate-300 mt-1 num-font">
+                  📅 ${formatArabicDate(h.effectiveStartDate, true)}
+                  ${h.duration > 1 ? ` — ${tr('إلى', 'au', 'to')} ${formatArabicDate(h.effectiveEndDate, true)}` : ''}
+                </p>
+                ${breakdownHtml}
+              </div>
+              <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
+                ${badgeHtml}
+                ${deleteBtnHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCalendarTab() {
+      const checkInput = document.getElementById('checkAnyDateInput');
+      if (!checkInput.value) {
+        checkInput.value = formatYMD(addDays(getSystemToday(), 30));
+      }
+      const targetDate = parseYMD(checkInput.value);
+      const st = getStatusForDate(targetDate);
+      const hijriTarget = formatHijriDate(targetDate, state.hijriOffset || 0);
+      document.getElementById('checkDateDayName').textContent = `${formatArabicDate(targetDate, true)}${hijriTarget ? ' • ' + hijriTarget : ''}`;
+
+      const checkDateStatusText = document.getElementById('checkDateStatusText');
+      const checkDateShiftHours = document.getElementById('checkDateShiftHours');
+      const checkDateBadge = document.getElementById('checkDateBadge');
+
+      if (st.isWork) {
+        checkDateStatusText.textContent = tr(
+          `اليوم رقم ${st.dayInPhase} من فترة العمل (يتبقى ${st.daysRemaining} يوم للخروج)`,
+          `Jour ${st.dayInPhase} de travail (Reste ${st.daysRemaining} j avant congé)`,
+          `Work day #${st.dayInPhase} (${st.daysRemaining} days left until leave)`
+        );
+        checkDateShiftHours.textContent = `${st.shiftLabel} • ${st.shiftHoursText}`;
+        checkDateBadge.className = st.shiftType === 'poste_night'
+          ? 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shrink-0'
+          : 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0';
+        checkDateBadge.textContent = st.shiftType === 'poste_night'
+          ? tr('عمل ليلي 🌙', 'Travail Nuit 🌙', 'Night Work 🌙')
+          : tr('عمل نهاري ☀️', 'Travail Jour ☀️', 'Day Work ☀️');
+      } else {
+        checkDateStatusText.textContent = tr(
+          `اليوم رقم ${st.dayInPhase} من الإجازة (باقي ${st.daysRemaining} يوم لانتهاء الإجازة)`,
+          `Jour ${st.dayInPhase} de congé (Reste ${st.daysRemaining} j avant reprise)`,
+          `Leave day #${st.dayInPhase} (${st.daysRemaining} days left until return)`
+        );
+        checkDateShiftHours.textContent = tr('راحة كاملة في البيت 🏠', 'Repos complet à la maison 🏠', 'Full rest at home 🏠');
+        checkDateBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0';
+        checkDateBadge.textContent = tr('في البيت 🏠', 'À la maison 🏠', 'At Home 🏠');
+      }
+
+      const year = state.calYear;
+      const month = state.calMonth;
+      const monthsArr = MONTHS_BY_LANG[state.lang || 'ar'] || MONTHS_BY_LANG.ar;
+      document.getElementById('calMonthYearTitle').textContent = `${monthsArr[month]} ${year}`;
+
+      const firstDayOfMonth = new Date(year, month, 1);
+      const startWeekday = firstDayOfMonth.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const holidayMap = {};
+      const allHolidays = getAllHolidaysEvaluated();
+      allHolidays.forEach(h => {
+        h.dayBreakdown.forEach(db => {
+          const key = formatYMD(db.date);
+          if (!holidayMap[key]) holidayMap[key] = [];
+          holidayMap[key].push(getHolName(h));
+        });
+      });
+
+      const todayYMD = formatYMD(getSystemToday());
+      const cells = [];
+
+      for (let i = 0; i < startWeekday; i++) {
+        cells.push(`<div class="h-12 sm:h-14 rounded-xl bg-slate-950/30"></div>`);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDate = new Date(year, month, day);
+        const ymd = formatYMD(cellDate);
+        const cellStatus = getStatusForDate(cellDate);
+        const isToday = ymd === todayYMD;
+        const holidaysOnDay = holidayMap[ymd] || [];
+
+        let bgClass = 'bg-emerald-500/15 border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/25';
+        let icon = '🏠';
+
+        if (cellStatus.isWork) {
+          if (cellStatus.shiftType === 'poste_night') {
+            bgClass = 'bg-indigo-500/20 border-indigo-400/50 text-indigo-200 hover:bg-indigo-500/30';
+            icon = cellStatus.isChangeoverRestDay ? '🔄' : '🌙';
+          } else {
+            bgClass = 'bg-amber-500/15 border-amber-500/40 text-amber-200 hover:bg-amber-500/25';
+            icon = cellStatus.isChangeoverRestDay ? '🔄' : '☀️';
+          }
+        }
+
+        const todayRing = isToday ? 'ring-2 ring-white font-extrabold' : '';
+        const holidayDot = holidaysOnDay.length > 0
+          ? `<span class="w-2 h-2 rounded-full bg-sky-400 inline-block" title="${holidaysOnDay.join('، ')}"></span>`
+          : '';
+
+        cells.push(`
+          <button type="button" data-cal-ymd="${ymd}" class="cal-day-cell h-12 sm:h-14 rounded-xl border p-1.5 flex flex-col items-center justify-between transition ${bgClass} ${todayRing}">
+            <div class="w-full flex items-center justify-between text-[10px]">
+              <span class="opacity-85">${icon}</span>
+              ${holidayDot}
+            </div>
+            <span class="text-sm font-bold">${day}</span>
+          </button>
+        `);
+      }
+
+      document.getElementById('calendarDaysGrid').innerHTML = cells.join('');
+    }
+
+    // --- Event Listeners & Interactions ---
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== `tab-${tabId}`);
+      });
+
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        const isTarget = btn.getAttribute('data-tab') === tabId;
+        if (btn.closest('.md\\:grid')) {
+          btn.className = isTarget
+            ? 'nav-tab-btn py-2.5 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 bg-amber-500 text-slate-950 shadow'
+            : 'nav-tab-btn py-2.5 px-4 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white';
+        } else {
+          btn.className = isTarget
+            ? 'nav-tab-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-amber-400 font-bold'
+            : 'nav-tab-btn flex flex-col items-center justify-center py-1.5 rounded-xl text-slate-400 font-bold';
+        }
+      });
+      saveState();
+      renderAll();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchTab(btn.getAttribute('data-tab'));
+        });
+      });
+
+      document.getElementById('quickStartDateInput').addEventListener('change', (e) => {
+        if (e.target.value) {
+          state.startDateStr = e.target.value;
+          saveState();
+          renderAll();
+        }
+      });
+
+      // Top Popup Select for Work Mode (Poste vs Surface)
+      document.getElementById('quickWorkModeSelect').addEventListener('change', (e) => {
+        state.workMode = e.target.value;
+        saveState();
+        renderAll();
+      });
+
+      // Settings Select for Work Mode
+      document.getElementById('settingWorkModeSelect').addEventListener('change', (e) => {
+        state.workMode = e.target.value;
+        saveState();
+        renderAll();
+      });
+
+      document.getElementById('btnSetTodayStart').addEventListener('click', () => {
+        state.startDateStr = formatYMD(getSystemToday());
+        saveState();
+        renderAll();
+      });
+
+      // Poste Order Buttons in Settings
+      document.getElementById('btnPosteNightFirst').addEventListener('click', () => {
+        state.posteOrder = 'night_first';
+        saveState();
+        renderAll();
+      });
+
+      document.getElementById('btnPosteDayFirst').addEventListener('click', () => {
+        state.posteOrder = 'day_first';
+        saveState();
+        renderAll();
+      });
+
+      // Toggle Upcoming Cycles Drawer on Dashboard
+      document.getElementById('btnToggleCyclesDrawer').addEventListener('click', () => {
+        state.openCyclesDrawer = !state.openCyclesDrawer;
+        saveState();
+        renderDashboard();
+      });
+
+      // Toggle Upcoming Holidays Popup Drawer on Dashboard
+      document.getElementById('btnToggleUpcomingHolidaysDrawer').addEventListener('click', () => {
+        state.openUpcomingHolidaysDrawer = !state.openUpcomingHolidaysDrawer;
+        saveState();
+        renderDashboard();
+      });
+
+      // Ramadan Year & Days Selectors and Daily Grid Toggle
+      document.getElementById('ramadanYearSelect').addEventListener('change', (e) => {
+        state.ramadanSelectedId = e.target.value;
+        saveState();
+        renderRamadanFastingBox();
+      });
+
+      document.getElementById('ramadanDaysCountSelect').addEventListener('change', (e) => {
+        state.ramadanDaysCount = parseInt(e.target.value, 10) || 30;
+        saveState();
+        renderRamadanFastingBox();
+      });
+
+      document.getElementById('btnToggleRamadanDrawer').addEventListener('click', () => {
+        state.openRamadanDrawer = !state.openRamadanDrawer;
+        saveState();
+        renderRamadanFastingBox();
+      });
+
+      document.getElementById('btnToggleAdhaDrawer').addEventListener('click', () => {
+        state.openAdhaDrawer = !state.openAdhaDrawer;
+        saveState();
+        renderEidAdhaBox();
+      });
+
+      document.getElementById('adhaYearSelect').addEventListener('change', (e) => {
+        state.adhaSelectedYear = e.target.value;
+        saveState();
+        renderEidAdhaBox();
+      });
+
+      // Settings Hijri Offset Buttons (-3 to +3)
+      document.querySelectorAll('.settings-hijri-offset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.hijriOffset = parseInt(btn.getAttribute('data-hijri-set'), 10) || 0;
+          saveState();
+          renderAll();
+        });
+      });
+
+
+
+      document.getElementById('btnViewAllHolidays').addEventListener('click', () => {
+        switchTab('holidays');
+      });
+
+      // Toggle Expandable Drawers on the two Holiday Summary Cards
+      document.getElementById('btnToggleHomeHolidaysDrawer').addEventListener('click', () => {
+        state.openHolidayDrawer = state.openHolidayDrawer === 'home' ? null : 'home';
+        renderHolidaysTab();
+      });
+      document.getElementById('btnToggleWorkHolidaysDrawer').addEventListener('click', () => {
+        state.openHolidayDrawer = state.openHolidayDrawer === 'work' ? null : 'work';
+        renderHolidaysTab();
+      });
+      document.getElementById('btnCloseHomeDrawer').addEventListener('click', () => {
+        state.openHolidayDrawer = null;
+        renderHolidaysTab();
+      });
+      document.getElementById('btnCloseWorkDrawer').addEventListener('click', () => {
+        state.openHolidayDrawer = null;
+        renderHolidaysTab();
+      });
+
+      document.querySelectorAll('.holiday-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.holidayFilter = btn.getAttribute('data-hfilter');
+          document.querySelectorAll('.holiday-filter-btn').forEach(b => {
+            const active = b.getAttribute('data-hfilter') === state.holidayFilter;
+            b.className = active
+              ? 'holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition'
+              : 'holiday-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white transition';
+          });
+          renderHolidaysTab();
+        });
+      });
+
+      document.getElementById('holidaysFullList').addEventListener('click', (e) => {
+        const delBtn = e.target.closest('[data-delete-custom]');
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-delete-custom');
+          state.customHolidays = (state.customHolidays || []).filter(item => item.id !== id);
+          saveState();
+          renderAll();
+        }
+      });
+
+      const customModal = document.getElementById('customEventModal');
+      document.getElementById('btnOpenAddCustomModal').addEventListener('click', () => {
+        document.getElementById('customEventStart').value = formatYMD(addDays(getSystemToday(), 15));
+        document.getElementById('customEventName').value = '';
+        customModal.classList.remove('hidden');
+      });
+      document.getElementById('btnCloseCustomModal').addEventListener('click', () => customModal.classList.add('hidden'));
+      document.getElementById('btnCancelCustomModal').addEventListener('click', () => customModal.classList.add('hidden'));
+      document.getElementById('btnSaveCustomEvent').addEventListener('click', () => {
+        const name = document.getElementById('customEventName').value.trim();
+        const startDate = document.getElementById('customEventStart').value;
+        const duration = Math.max(1, parseInt(document.getElementById('customEventDays').value, 10) || 1);
+        if (!name || !startDate) return;
+
+        state.customHolidays = state.customHolidays || [];
+        state.customHolidays.push({
+          id: 'custom-' + Date.now(),
+          name,
+          startDate,
+          duration,
+          category: 'custom',
+          hijriNote: 'مناسبة خاصة'
+        });
+        saveState();
+        customModal.classList.add('hidden');
+        renderAll();
+      });
+
+      document.getElementById('checkAnyDateInput').addEventListener('change', () => {
+        renderCalendarTab();
+      });
+
+      document.getElementById('calPrevMonthBtn').addEventListener('click', () => {
+        state.calMonth--;
+        if (state.calMonth < 0) {
+          state.calMonth = 11;
+          state.calYear--;
+        }
+        renderCalendarTab();
+      });
+      document.getElementById('calNextMonthBtn').addEventListener('click', () => {
+        state.calMonth++;
+        if (state.calMonth > 11) {
+          state.calMonth = 0;
+          state.calYear++;
+        }
+        renderCalendarTab();
+      });
+      document.getElementById('calJumpTodayBtn').addEventListener('click', () => {
+        const t = getSystemToday();
+        state.calYear = t.getFullYear();
+        state.calMonth = t.getMonth();
+        renderCalendarTab();
+      });
+
+      document.getElementById('calendarDaysGrid').addEventListener('click', (e) => {
+        const cell = e.target.closest('[data-cal-ymd]');
+        if (!cell) return;
+        const ymd = cell.getAttribute('data-cal-ymd');
+        const d = parseYMD(ymd);
+        const st = getStatusForDate(d);
+        const hijriD = formatHijriDate(d, state.hijriOffset || 0);
+        const detailEl = document.getElementById('calSelectedDayDetail');
+        const statusLabel = st.isWork
+          ? `<span class="text-amber-400 font-extrabold">${st.shiftLabel} (${tr('اليوم', 'Jour', 'Day')} ${st.dayInPhase} / ${st.phaseTotal}) • ${st.shiftHoursText}</span>`
+          : `<span class="text-emerald-400 font-extrabold">${tr('في البيت 🏠', 'À la maison 🏠', 'At Home 🏠')} (${tr('اليوم', 'Jour', 'Day')} ${st.dayInPhase} / ${st.phaseTotal})</span>`;
+        detailEl.innerHTML = `
+          <span>📅 <strong>${formatArabicDate(d, true)}</strong> ${hijriD ? `<span class="text-sky-400">(${hijriD})</span>` : ''}: ${statusLabel}</span>
+          <span class="num-font text-slate-400">${tr(`يتبقى ${st.daysRemaining} يوم للتبديل`, `Reste ${st.daysRemaining} j avant changement`, `${st.daysRemaining} days until switch`)}</span>
+        `;
+      });
+
+
+
+      // Language Switcher Buttons (ar / fr / en)
+      document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.lang = btn.getAttribute('data-lang-set') || 'ar';
+          saveState();
+          renderAll();
+        });
+      });
+
+      // Custom Shift Entry & Exit Time Inputs
+      const timeBindings = [
+        ['timePosteDayStart', 'posteDayStart'],
+        ['timePosteDayEnd', 'posteDayEnd'],
+        ['timePosteNightStart', 'posteNightStart'],
+        ['timePosteNightEnd', 'posteNightEnd'],
+        ['timeSurfaceMorningStart', 'surfaceMorningStart'],
+        ['timeSurfaceMorningEnd', 'surfaceMorningEnd'],
+        ['timeSurfaceAfternoonStart', 'surfaceAfternoonStart'],
+        ['timeSurfaceAfternoonEnd', 'surfaceAfternoonEnd']
+      ];
+      timeBindings.forEach(([elId, key]) => {
+        const el = document.getElementById(elId);
+        if (el) {
+          el.addEventListener('change', (e) => {
+            if (e.target.value) {
+              state[key] = e.target.value;
+              saveState();
+              renderAll();
+            }
+          });
+        }
+      });
+
+      document.getElementById('commonRotationPresetSelect').addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val && val !== 'custom') {
+          const [w, h] = val.split(',').map(Number);
+          if (w > 0 && h > 0) {
+            state.workDays = w;
+            state.homeDays = h;
+            saveState();
+            renderAll();
+          }
+        }
+      });
+
+      document.getElementById('btnResetDefaults').addEventListener('click', () => {
+        state = {
+          startDateStr: defaultStartDate,
+          workDays: 28,
+          homeDays: 28,
+          workMode: 'poste',
+          posteOrder: 'night_first',
+          posteSegmentsStr: '14,14',
+          hijriOffset: 0,
+          holidayDateOverrides: {},
+          holidayFilter: 'all',
+          openHolidayDrawer: null,
+          openUpcomingHolidaysDrawer: false,
+          openCyclesDrawer: false,
+          ramadanSelectedId: 'ramadan-2027',
+          ramadanDaysCount: 30,
+          openRamadanDrawer: false,
+          adhaSelectedYear: '2027',
+          openAdhaDrawer: false,
+          lang: state.lang || 'ar',
+          posteDayStart: '05:50',
+          posteDayEnd: '18:00',
+          posteNightStart: '17:50',
+          posteNightEnd: '06:00',
+          surfaceMorningStart: '06:50',
+          surfaceMorningEnd: '11:45',
+          surfaceAfternoonStart: '12:50',
+          surfaceAfternoonEnd: '18:50',
+          activeTab: 'settings',
+          calYear: todayDate.getFullYear(),
+          calMonth: todayDate.getMonth(),
+          customHolidays: []
+        };
+        saveState();
+        renderAll();
+      });
+
+
+
+      switchTab(state.activeTab || 'dashboard');
+      if (shiftClockTimerId) clearInterval(shiftClockTimerId);
+      shiftClockTimerId = setInterval(updateShift12HourClock, 1000);
+    });
+  </script>
+</body>
+</html>
