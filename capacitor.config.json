@@ -1,0 +1,12 @@
+{
+  "appId": "com.amali.app",
+  "appName": "عملي",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
